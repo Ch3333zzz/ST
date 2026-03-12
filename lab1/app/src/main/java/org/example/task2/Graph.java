@@ -93,11 +93,12 @@ public class Graph {
 
     private String reconstructPath(Map<Vertex, Vertex> predecessors, Vertex start, Vertex end) {
         if (predecessors.get(end) == null && !start.equals(end)) return "No path";
+        
         List<String> pathNodes = new ArrayList<>();
         for (Vertex v = end; v != null; v = predecessors.get(v)) {
             pathNodes.add(v.getName());
-            if (v.equals(start)) break;
         }
+        
         Collections.reverse(pathNodes);
         return String.join(" -> ", pathNodes);
     }

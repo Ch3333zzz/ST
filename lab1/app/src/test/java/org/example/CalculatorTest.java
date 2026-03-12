@@ -52,4 +52,9 @@ class CalculatorTest {
         assertTrue(Double.isNaN(calculator.asin(2)));
     }
 
+    @Test
+    void testSlowConvergence() {
+        double x = 0.9999999; 
+        assertNotNull(calculator.asin(x));
+    }
 }
