@@ -1,60 +1,39 @@
 package org.example;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.example.task1.Calculator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class CalculatorTest {
 
     private Calculator calculator;
-
     private final double ERROR = 0.0001;
 
     @BeforeEach
-    public void testSetUp() {
+    public void setUp() {
         calculator = new Calculator();
     }
 
-    @Test 
-    void testNegativeOutOfRange() {
-        assertTrue(Double.isNaN(calculator.asin(-2)));
+    @ParameterizedTest()
+    @CsvSource({
+        "-1.0, -1.570796", // -PI/2
+        "-0.5, -0.523598", // -PI/6
+        "0.0,   0.0",
+        "0.5,   0.523598",
+        "1.0,   1.570796",
+        "0.999, 1.526123"
+    })
+    void testAsinValidRange(double input, double expected) {
+        assertEquals(expected, calculator.asin(input), ERROR);
     }
 
-    @Test 
-    void testLeftBoundaryPoint() {
-        assertEquals(-Math.PI/2, calculator.asin(-1), ERROR);
-    } 
-
-    @Test 
-    void testNegativeInRange() {
-        assertEquals(-Math.PI/6, calculator.asin(-0.5), ERROR);
-    }
-
-    @Test 
-    void testZero() {
-        assertEquals(0, calculator.asin(0), ERROR);
-    }
-
-    @Test 
-    void testPositiveInRange() {
-        assertEquals(Math.PI/6, calculator.asin(0.5), ERROR);
-    }
-
-    @Test 
-    void testRightBoundaryPoint() {
-        assertEquals(Math.PI/2, calculator.asin(1), ERROR);
-    } 
-
-    @Test 
-    void testPositiveOutOfRange() {
-        assertTrue(Double.isNaN(calculator.asin(2)));
-    }
-
-    @Test
-    void testSlowConvergence() {
-        double x = 0.9999999; 
-        assertNotNull(calculator.asin(x));
+    @ParameterizedTest()
+    @ValueSource(doubles = {-2.0, 2.0})
+    void testAsinInvalidRange(double input) {
+        assertTrue(Double.isNaN(calculator.asin(input)));
     }
 }
