@@ -7,13 +7,6 @@ public class Answer {
     private double finalLength;
     private String path;
 
-    /*
-    START - algorythm started
-    EXTRACT_MIN - choose the smallest weight
-    UPDATE - found a shorter path
-    SKIP - found an equal or bigger path
-    END - end of algorythm
-     */
     private final List<String> executionLog = new ArrayList<>();
 
     public double getFinalLength() {
