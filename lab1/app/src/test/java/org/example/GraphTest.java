@@ -15,6 +15,33 @@ public class GraphTest {
     void setUp() {
         graph = new Graph();
     }
+    
+    @Test
+    void test() {
+        Vertex v1 = new Vertex("1");
+        Vertex v2 = new Vertex("2");
+        Vertex v3 = new Vertex("3");
+        Vertex v4 = new Vertex("4");
+
+        Edge e1 = new Edge(1, v1, v4);
+        Edge e2 = new Edge(32, v3, v2);
+
+        graph.addVertex(v1);
+        graph.addVertex(v2);
+        graph.addVertex(v3);
+        graph.addVertex(v4);
+
+        graph.addEdge(e1);
+        graph.addEdge(e2);
+
+
+        List<Answer> ans = graph.findAllShortestPaths(v1);
+
+        Answer rAnswer = ans.get(1); 
+
+        assertEquals("No path", rAnswer.getPath());
+        assertEquals(Double.POSITIVE_INFINITY, rAnswer.getFinalLength());
+    }
 
     @Test
     void pathWhenStartEqualsTarget() {

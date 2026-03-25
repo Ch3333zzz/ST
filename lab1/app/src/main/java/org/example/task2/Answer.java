@@ -24,5 +24,4 @@ public class Answer {
     public List<String> getExecutionLog() {
         return executionLog;
     }
-
 }
