@@ -18,7 +18,6 @@ public class main {
         double step = 0.01;
         double eps = 0.001;
 
-        // Инициализируем цепочку
         MathFunction sin = new SinFunction();
         MathFunction cos = new CosFunction(sin);
         MathFunction tan = new TanFunction(sin, cos);

@@ -1,0 +1,105 @@
+@startuml
+interface MathFunction {
+    +double calculate(value : double, error :double)
+}
+abstract class AbstractMathFunction {
+    +double calculate(value : double, error : double)
+    +{abstract} double doCalculate(value : double, error : double)
+}
+class SinFunction {
+    +double doCalculate(value : double, error : double)
+    - {static} MAX_ITER
+}
+class CosFunction {
+    +CosFunction(sin : MathFunction)
+    +double doCalculate(value : double, error : double)
+    -MathFunction sin
+}
+class TanFunction {
+    +TanFunction(sin : MathFunction, cos : MathFunction)
+    +double doCalculate(value : double, error : double)
+    -MathFunction sin
+    -MathFunction cos
+}
+class CotFunction {
+    +CotFuntion(cos : MathFunction, sin : MathFunction)
+    +double doCalculate(value : double, error : double)
+    -MathFunction cos
+    -MathFunction sin
+}
+class CscFunction {
+    +CscFunction(sin : MathFunction)
+    +double doCalculate(value : double, error : double)
+    -MathFunction sin
+}
+class SecFunction {
+    +SecFunction(cos : MathFunction)
+    +double doCalculate(value : double, error : double)
+    -MathFunction cos
+}
+class LnFunction {
+    +double doCalculate(value : double, error : double)
+    - {static} MAX_ITER
+}
+class LogFunction {
+    +LogFunction(ln : MathFunction, base : double)
+    +double doCalculate(value : double, error : double)
+    -MathFunction ln
+    -double base 
+}
+class SystemFucntion {
+    +SystemFunction(sin : MathFunction, cos : MathFunction, tan : MathFunction, 
+                        cot : MathFunction, sec : MathFunction, csc : MathFunction, 
+                        ln : MathFunction, log2 : MathFunction, log3 : MathFunction, 
+                        log5 : MathFunction)
+    +double doCalculate(value : double, error : double)
+    -double calculateTrigPart(value : double, error : double)
+    -double calculateLogPart(value : double, error : double)
+    -MathFunction sin
+    -MathFunction cos
+    -MathFunction tan
+    -MathFunction cot
+    -MathFunction sec
+    -MathFunction csc
+
+    -MathFunction ln
+    -MathFunction log2
+    -MathFunction log3
+    -MathFunction log5
+}
+class CsvWriter {
+    -char delimeter
+    +void write(filename : String, function : MathFunction, from : double, to : double, step : double, eps : double)
+}
+class main {
+    +{static} void main(args : String[])
+}
+MathFunction <|.. AbstractMathFunction
+AbstractMathFunction <|-- SinFunction
+AbstractMathFunction <|-- CosFunction
+AbstractMathFunction <|-- TanFunction
+AbstractMathFunction <|-- CotFunction
+AbstractMathFunction <|-- CscFunction
+AbstractMathFunction <|-- SecFunction
+AbstractMathFunction <|-- LnFunction
+AbstractMathFunction <|-- LogFunction
+AbstractMathFunction <|-- SystemFucntion
+
+
+
+CosFunction "1" o-- "1" MathFunction : uses (sin)
+TanFunction "1" o-- "2" MathFunction : uses (sin, cos)
+CotFunction "1" o-- "2" MathFunction : uses (cos, sin)
+CscFunction "1" o-- "1" MathFunction : uses (sin)
+SecFunction "1" o-- "1" MathFunction : uses (cos)
+LogFunction "1" o-- "1" MathFunction : uses (ln)
+SystemFucntion "1" o-- "10" MathFunction : uses (sin, cos, tan, cot, sec, csc, ln, log2, log3, log5)
+main ..> CsvWriter : executes
+main ..> MathFunction : manages (sin, cos, tan, cot, sec, csc, ln, log2, log3, log5, system) 
+
+
+
+
+
+
+@enduml
