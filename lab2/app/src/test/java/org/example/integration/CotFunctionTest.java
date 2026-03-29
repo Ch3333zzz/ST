@@ -10,6 +10,7 @@ import org.example.functions.trigonometry.SinFunction;
 import org.example.functions.trigonometry.TanFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -35,14 +36,7 @@ public class CotFunctionTest {
     }
 
     @ParameterizedTest(name = "checking valid values")
-    @CsvSource(value = {
-        "-1.570796,  0",                 // x=-PI/2: sin=1, cos=0 -> cot=0
-        "0.785398,   1",                 // x=PI/4: sin=0.707, cos=0.707 -> tan=1
-        "-0.785398,  -1",
-        "1.570796,   0",                 // x=PI/2: sin=1, cos=0 -> cot=0
-        "2.356194,  -1",                 // x=3PI/4: sin=0.707, cos=-0.707 -> tan=-1
-        "2.356194,  -1"
-    })
+    @CsvFileSource(resources = "/cot.csv", numLinesToSkip = 1)
     void validArgumentTest(double argument, double expected) {
         MathFunction cot = new CotFuntion(cosReal, sinReal);
 

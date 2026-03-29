@@ -15,33 +15,53 @@
 2. С помощью JUNIT5 разработать тестовое покрытие системы функций, проведя анализ эквивалентности и учитывая особенности системы функций. Для анализа особенностей системы функций и составляющих ее частей можно использовать сайт https://www.wolframalpha.com/.
 3. Собрать приложение, состоящее из заглушек. Провести интеграцию приложения по 1 модулю, с обоснованием стратегии интеграции, проведением интеграционных тестов и контролем тестового покрытия системы функций.
 ## Выполение
+В качестве тестового покрытия я выбрал ОДЗ функций, а также их экстремумы.
+Стратегия тестирования - снизу вверх, потому что если падает тест, то мы точно значем, что ошибка в тестируемой функции, посольку тесты до успешно прошли, а также мы контролируем погрешность вычислений.
 Начнем с реалиализации более мелких функций
 ### Базовые функции
 #### sin(x)
-![sin](/lab2/static/sin.png)
 ОДЗ - R (все вещественные числа)
+![sin](/lab2/static/sin.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_sin.png)
 #### ln(x)
-![ln](/lab2/static/ln.png)
 ОДЗ - x > 0
+![ln](/lab2/static/ln.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_ln.png)
 ### Остальные функции
 #### cos(x)
-![cos](/lab2/static/cos.png)
 ОДЗ - R
+![cos](/lab2/static/cos.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_cos.png)
 #### tan(x)
-![tan](/lab2/static/tan.png)
 ОДЗ - R, кроме +-pi/2 + pi*n, n - целое
+![tan](/lab2/static/tan.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_tan.png)
 #### cot(x)
 ОДЗ - R, кроме pi*n, n - целое
 ![cot](/lab2/static/cot.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_cot.png)
 #### sec(x)
 ОДЗ - R, кроме +-pi/2 + pi*n, n - целое
 ![sec](/lab2/static/sec.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_sec.png)
 #### csc(x)
 ОДЗ - R, кроме pi*n, n - целое
 ![csc](/lab2/static/csc.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_csc.png)
 #### log2(x)
 ОДЗ x > 0
 ![csc](/lab2/static/log2.png)
+Проверяемые точки (для всех логарифмов одинаковые)
+![check_points](/lab2/static/check_points_log_arg.png)
+Проверяемые точки при задавании базы
+![check_points](/lab2/static/check_points_log_base.png)
 #### log3(x)
 ОДЗ x > 0
 ![csc](/lab2/static/log3.png)
@@ -51,11 +71,18 @@
 ### Система
 ОДЗ - R, кроме pi\*n, +-pi/2 + pi\*n, n < 0 и целое
 ![system](/lab2/static/sys_graph.png)
+Проверяемые точки
+![check_points](/lab2/static/check_points_system_left.png)
+![check_points](/lab2/static/check_points_system_right.png)
+
 из Desmos
 ![sys_desmos](/lab2/static/sys_desmos.png)
 
 <b>Примечание:</b>
 Графики отличаются c реальными только в точках разрыва - графики рисовались exel и в точке разрыва (не из ОДЗ) он соединял две соседние точки.
-
+ // добавить точки, тестирование сверху вниз
 ### UML-диаграмма классов
 ![uml](/lab2/static/uml.png)
+
+### Вывод
+Я научился производить интеграционное тестирование, научился использовать Mockito для использования заглушек.

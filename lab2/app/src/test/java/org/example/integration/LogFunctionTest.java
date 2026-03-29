@@ -10,6 +10,7 @@ import org.example.functions.logarifms.LnFunction;
 import org.example.functions.logarifms.LogFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -31,7 +32,7 @@ public class LogFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing values for base inside of range of permissible values")
-    @ValueSource(doubles = { 0.5, 2.0, 10.0 })
+    @CsvFileSource(resources = "/log_base.csv", numLinesToSkip = 1)
     void testValidBase(double base) {
         assertDoesNotThrow(() -> new LogFunction(lnReal, base));
     }
@@ -53,12 +54,7 @@ public class LogFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing values for argument inside of range of permissible values")
-    @CsvSource(value = {
-    //    "2.0,    2.0,  1.0",     // log2(2) = 1.0
-        "4.0,      2.0,  2.0",     // log2(4) = 2.0
-        "1.0,      2.0,  0.0",      // log2(1) = 0.0
-
-    })
+    @CsvFileSource(resources = "/log_arg.csv", numLinesToSkip = 1)
     void testValidArgument(double argument, double base, double expectedLog) {
 
         LogFunction testLog = new LogFunction(lnReal, base);

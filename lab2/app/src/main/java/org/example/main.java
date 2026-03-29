@@ -12,7 +12,7 @@ import org.example.functions.trigonometry.SinFunction;
 import org.example.functions.trigonometry.TanFunction;
 import org.example.util.CsvWriter;
 
-public class main {
+public class Main {
     public static void main(String[] args) {
         CsvWriter writer = new CsvWriter();
         double step = 0.01;

@@ -3,6 +3,7 @@ package org.example.module;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -17,12 +18,7 @@ public class LnFunctionTest {
     private final double EPS = 0.001;
 
     @ParameterizedTest(name = "checking standard values (x > 0)")
-    @CsvSource(value = {
-        "1.0, 0.0",
-        "2.7182818, 1.0", // e
-        "0.5, -0.693147", // (0; 1) - negative
-        "2.0, 0.693147",  // (1; +inf) - positive
-    })
+    @CsvFileSource(resources = "/ln.csv", numLinesToSkip = 1)
     void testStandardPoints(double x, double expected) {
         double actual = ln.calculate(x, EPS);
         

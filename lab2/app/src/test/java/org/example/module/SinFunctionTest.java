@@ -3,7 +3,7 @@ package org.example.module;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,31 +15,9 @@ public class SinFunctionTest {
     private final SinFunction sin = new SinFunction();
     private final double EPS = 0.001;
 
-    @ParameterizedTest(name = "checking values ​​within the range [-pi; pi]")
-    @CsvSource(value = {
-        "0, 0",
-        "3.1415926, 0", // PI
-        "-3.1415926, 0", // -PI
-        "1.570796, 1", // PI / 2
-        "-1.570796, -1" // - PI / 2
-    })
+    @ParameterizedTest(name = "checking values in ODZ")
+    @CsvFileSource(resources = "/sin.csv", numLinesToSkip = 1)
     void testStandardPoints(double x, double expected) {
-        double actual = sin.calculate(x, EPS);
-        
-        assertEquals(expected, actual, EPS);
-    }
-
-    @ParameterizedTest(name = "checking normalizing argument (when x out of [-PI;PI]")
-    @CsvSource(value = {
-        "-15.707963, 0", // 5 * (-PI)
-        "-7.853981, -1", // 5 * * (-PI/2)
-        "7.853981, 1", // 5 * PI/2
-        "15.707963, 0", // 5 * PI
-        "4.0, -0.756802",  // nX > PI
-        "-4.0, 0.756802"   // nX < -PI
-
-    })
-    void testArgumentNormalization(double x, double expected) {
         double actual = sin.calculate(x, EPS);
         
         assertEquals(expected, actual, EPS);

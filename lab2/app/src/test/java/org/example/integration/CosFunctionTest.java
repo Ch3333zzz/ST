@@ -5,6 +5,7 @@ import org.example.functions.trigonometry.CosFunction;
 import org.example.functions.trigonometry.SinFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -31,14 +32,7 @@ public class CosFunctionTest {
     }
 
     @ParameterizedTest(name = "Integration check correct values for cos")
-    @CsvSource(value = {
-        "0, 1",                // x=0
-        "6.283185, 1",         // x=2PI
-        "3.1415926, -1",      // x=PI
-        "-3.1415926, -1",     // x=-PI
-        "1.570796, 0",         // x=PI/2
-        "-1.570796, 0"         // x=-PI/2
-    })
+    @CsvFileSource(resources = "/cos.csv", numLinesToSkip = 1)
     void testCosSinIntegration(double x, double expected) {
         MathFunction cos = new CosFunction(realSin);
 

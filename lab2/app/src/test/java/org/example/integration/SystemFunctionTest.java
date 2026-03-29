@@ -15,6 +15,7 @@ import org.example.functions.trigonometry.SinFunction;
 import org.example.functions.trigonometry.TanFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -74,32 +75,7 @@ public class SystemFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing between bad points")
-    @CsvSource({
-        // (-0.99552; 0)
-        "-0.7854, 5.00277",
-        "-7.0686, 5.00277",
-        // max point
-        "-0.99552, 6.5947",
-        "-7.2787, 6.5947",
-        // (-pi/2; -0.99552)
-        "-1.1, 4.20354",
-        "-7.38318, 4.20354",
-        // (-pi; -pi/2)
-        "-2.3562, 0.45797",
-        "-8.6394, 0.45797",
-        // (-3pi/2; -pi)
-        "-3.7, -15.74816",
-        "-9.9832, -15.74816",
-        // (-5.9344; -3pi/2)
-        "-5.8, -2.15872",
-        "-12.0832, -2.15872",
-        // min point
-        "-5.9344, -2.41496",
-        "-12.21758, -2.41496",
-        // (-2pi; -5.9344)
-        "-6.1, -1.84896",
-        "-12.38318, -1.84896"
-    })
+    @CsvFileSource(resources = "/system_left.csv", numLinesToSkip = 1)
     void testTrigIntervalsFullIsolation(double x, double expected) {
 
         double result = system.calculate(x, EPS);
@@ -109,11 +85,7 @@ public class SystemFunctionTest {
     }
 
     @ParameterizedTest(name = "Log part Asymptote check")
-    @CsvSource({
-        "0.5, -0.07456",
-        "2.17736, 0.06385",
-        "5.0, -0.84145"
-    })
+    @CsvFileSource(resources = "/system_right.csv", numLinesToSkip = 1)
     void testLogPartFullIsolation(double x, double expected) {
 
         double result = system.calculate(x, EPS);

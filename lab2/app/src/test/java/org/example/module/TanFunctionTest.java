@@ -9,6 +9,7 @@ import org.example.functions.MathFunction;
 import org.example.functions.trigonometry.TanFunction;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -37,17 +38,8 @@ public class TanFunctionTest {
     }
 
     @ParameterizedTest(name = "checking valid values")
-    @CsvSource(value = {
-        "0, 0, 1, 0",                   // x=0
-        "6.283185, 0, 1, 0",            // x=2PI
-        "0.785398, 0.7071, 0.7071, 1",   // x=PI/4
-        "-0.785398, -0.7071, 0.7071, -1",// x=-PI/4
-        "2.356194, 0.7071, -0.7071, -1", // x=3PI/4
-        "-2.356194, -0.7071, -0.7071, 1",// x=-3PI/4
-        "3.141592, 0, -1, 0",           // x=PI
-        "-3.141592, 0, -1, 0"           // x=-PI
-    })
-    void validArgumentTest(double argument, double sinRes, double cosRes, double expected) {
+    @CsvFileSource(resources = "/tan.csv", numLinesToSkip = 1)
+    void validArgumentTest(double argument, double expected, double sinRes, double cosRes) {
         MathFunction tan = new TanFunction(sinMock, cosMock);
         
         Mockito.doReturn(sinRes).when(sinMock).calculate(eq(argument), anyDouble());

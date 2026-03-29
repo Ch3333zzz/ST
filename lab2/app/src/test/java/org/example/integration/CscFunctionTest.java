@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -40,20 +41,7 @@ public class CscFunctionTest {
     }
 
     @ParameterizedTest(name = "Checking valid values")
-    @CsvSource(value = {
-        "1.570796, 1.0",    // PI/2: sin=1 -> csc=1
-        "7.853981, 1.0",    // PI/2 + 2PI
-        "-1.570796, -1.0", // -PI/2: sin=-1 -> csc=-1
-        "4.712388, -1.0", // -PI/2 + 2 PI
-        "0.523598, 2.0",    // PI/6: sin=0.5 -> csc=2
-        "6.806784, 2.0",      // PI/6 + 2PI
-        "2.617993, 2.0",    // 5PI/6: sin=0.5 -> csc=2
-        "8.901179, 2.0",    // 5PI/6 + 2PI
-        "-0.523598, -2.0",    // -PI/6
-        "5.759587, -2.0",    // -PI/6 + 2PI
-        "-2.617993, -2.0",    // -5PI/6
-        "3.665191, -2.0"     // -5PI/6 + 2PI
-    })
+    @CsvFileSource(resources = "/csc.csv", numLinesToSkip = 1)
     void testValidValues(double argument, double expected) {
         MathFunction csc = new CscFunction(sinReal);
         

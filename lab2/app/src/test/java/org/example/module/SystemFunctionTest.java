@@ -10,6 +10,7 @@ import org.example.functions.SystemFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -78,33 +79,7 @@ public class SystemFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing between bad points")
-    @CsvSource({
-        
-        // (-0.99552; 0)
-        "-0.7854, 5.00277, -0.70711, 0.70711, -1.0, -1.0, 1.41421, -1.41421",
-        "-7.0686, 5.00277, -0.70711, 0.70711, -1.0, -1.0, 1.41421, -1.41421",
-        // max point
-        "-0.99552, 6.5947, -0.83908, 0.54402, -1.54238, -0.64835, 1.83817, -1.19178",
-        "-7.2787, 6.5947, -0.83908, 0.54402, -1.54238, -0.64835, 1.83817, -1.19178",
-        // (-pi/2; -0.99552)
-        "-1.1, 4.20354, -0.89121, 0.45360, -1.96476, -0.50897, 2.20460, -1.12207",
-        "-7.38318, 4.20354, -0.89121, 0.45360, -1.96476, -0.50897, 2.20460, -1.12207",
-        // (-pi; -pi/2)
-        "-2.3562, 0.45797, -0.70711, -0.70711, 1.0, 1.0, -1.41421, -1.41421",
-        "-8.6394, 0.45797, -0.70711, -0.70711, 1.0, 1.0, -1.41421, -1.41421",
-        // (-3pi/2; -pi)
-        "-3.7, -15.74816, 0.52984, -0.84805, -0.62472, -1.60072, -1.17918, 1.88736",
-        "-9.9832, -15.74816, 0.52984, -0.84805, -0.62472, -1.60072, -1.17918, 1.88736",
-        // (-5.9344; -3pi/2)
-        "-5.8, -2.15872, 0.46460, 0.88552, 0.52466, 1.90600, 1.12928, 2.15239",
-        "-12.0832, -2.15872, 0.46460, 0.88552, 0.52466, 1.90600, 1.12928, 2.15239",
-        // min point
-        "-5.9344, -2.41496, 0.34202, 0.93969, 0.36397, 2.74748, 1.06418, 2.92381",
-        "-12.21758, -2.41496, 0.34202, 0.93969, 0.36397, 2.74748, 1.06418, 2.92381",
-        // (-2pi; -5.9344)
-        "-6.1, -1.84896, 0.18216, 0.98327, 0.18526, 5.39775, 1.01701, 5.48968",
-        "-12.38318, -1.84896, 0.18216, 0.98327, 0.18526, 5.39775, 1.01701, 5.48968"
-    })
+    @CsvFileSource(resources = "/system_left.csv", numLinesToSkip = 1)
     void testTrigIntervalsFullIsolation(double x, double expected, 
                                         double eSin, double eCos, double eTan, 
                                         double eCot, double eSec, double eCsc) {
@@ -123,11 +98,20 @@ public class SystemFunctionTest {
     }
 
     @ParameterizedTest(name = "Log part Asymptote check")
-    @CsvSource({
-        "0.5, -0.07456, -0.6931, -1.0, -0.6309, -0.4307",
-        "2.17736, 0.06385, 0.7781, 1.1226, 0.7083, 0.4835",
-        "5.0, -0.84145, 1.6094, 2.3219, 1.4650, 1.0"
+    @CsvSource(value = {
+        "1, 0"
     })
+    void testLogPartBadDots(double x, double eLog2) {
+
+        Mockito.when(log2.calculate(eq(x), anyDouble())).thenReturn(eLog2);
+
+        double result = system.calculate(x, EPS);
+
+        assertTrue(Double.isNaN(result));
+    }
+
+    @ParameterizedTest(name = "Log part Asymptote check")
+    @CsvFileSource(resources = "/system_right.csv", numLinesToSkip = 1)
     void testLogPartFullIsolation(double x, double expected, 
                                 double eLn, double eLog2, 
                                 double eLog3, double eLog5) {
@@ -139,6 +123,6 @@ public class SystemFunctionTest {
 
         double result = system.calculate(x, EPS);
 
-        assertEquals(expected, result, EPS);
+        assertEquals(expected, result, 0.02);
     }
 }

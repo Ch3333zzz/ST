@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -41,20 +42,7 @@ public class SecFunctionTest {
     }
 
     @ParameterizedTest(name = "Checking valid values")
-    @CsvSource(value = {
-        "3.1415926,  -1.0",   // PI: cos=-1 -> sec=-1
-        "-3.1415926, -1.0",   // -PI: cos=-1 -> sec=-1
-        "0.0,         1.0",   // 0: cos=1 -> sec=1
-        "6.283185,    1.0",   // 2PI: cos=1 -> sec=1
-        "1.04719,     2.0",   // PI/3: cos=0.5 -> sec=2
-        "7.330382,    2.0",   // PI/3 + 2PI -> sec=2
-        "2.094395,   -2.0",   // 2PI/3: cos=-0.5 -> sec=-2
-        "8.377580,   -2.0",   // 2PI/3 + 2PI -> sec=-2
-        "4.188790,   -2.0",   // 4PI/3: cos=-0.5 -> sec=-2
-        "10.471975,  -2.0",   // 4PI/3 + 2PI -> sec=-2
-        "5.235987,    2.0",   // 5PI/3: cos=0.5 -> sec=2
-        "11.519173,   2.0"    // 5PI/3 + 2PI -> sec=2
-    })
+    @CsvFileSource(resources = "/sec.csv", numLinesToSkip = 1)
     void testValidValues(double argument, double expected) {
         MathFunction sec = new SecFunction(cosReal);
         

@@ -11,6 +11,7 @@ import org.example.functions.MathFunction;
 import org.example.functions.logarifms.LogFunction;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -31,7 +32,7 @@ public class LogFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing values for base inside of range of permissible values")
-    @ValueSource(doubles = { 0.5, 2.0, 10.0 })
+    @CsvFileSource(resources = "/log_base.csv", numLinesToSkip = 1)
     void testValidBase(double base) {
         assertDoesNotThrow(() -> new LogFunction(lnMock, base));
     }
@@ -53,13 +54,8 @@ public class LogFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing values for argument inside of range of permissible values")
-    @CsvSource(value = {
-    //    "2.0,      2.0,  0.693,      0.693,  1.0",     // log2(2) = 1.0
-        "4.0,      2.0,  1.386,      0.693,  2.0",     // log2(4) = 2.0
-        "1.0,      2.0,  0.0,        0.693,  0.0",      // log2(1) = 0.0
-
-    })
-    void testValidArgument(double argument, double base, double lnArgument, double lnBase, double expectedLog) {
+    @CsvFileSource(resources = "/log_arg.csv", numLinesToSkip = 1)
+    void testValidArgument(double argument, double base, double expectedLog, double lnArgument, double lnBase) {
         Mockito.doReturn(lnArgument).when(lnMock).calculate(eq(argument), anyDouble());
         
         Mockito.doReturn(lnBase).when(lnMock).calculate(eq(base), anyDouble());

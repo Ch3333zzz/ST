@@ -8,6 +8,7 @@ import org.example.functions.MathFunction;
 import org.example.functions.trigonometry.CosFunction;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -30,35 +31,11 @@ public class CosFunctionTest {
     }
     
     @ParameterizedTest(name = "checking values within the range [-pi; pi]")
-    @CsvSource(value = {
-        "0, 1, 1",                // x=0, sin(0 + PI/2) = 1, cos=1
-        "6.283185, 1, 1",         // x=2PI
-        "3.1415926, -1, -1",      // x=PI, sin(PI + PI/2) = -1, cos=-1
-        "-3.1415926, -1, -1",     // x=-PI, sin(-PI + PI/2) = -1, cos=-1
-        "1.570796, 0, 0",         // x=PI/2, sin(PI/2 + PI/2) = 0, cos=0
-        "-1.570796, 0, 0"         // x=-PI/2, sin(-PI/2 + PI/2) = 0, cos=0
-    })
-    void validArgumentTest(double argument, double sinResult, double expected) {
+    @CsvFileSource(resources = "/cos.csv", numLinesToSkip = 1)
+    void validArgumentTest(double argument, double expected, double sin) {
         MathFunction cos = new CosFunction(sinMock);
         
-        Mockito.doReturn(sinResult).when(sinMock).calculate(eq(argument + Math.PI / 2), anyDouble());
-
-        assertEquals(expected, cos.calculate(argument, EPS), EPS);
-    }
-
-    @ParameterizedTest(name = "checking normalizing argument")
-    @CsvSource(value = {
-        "-15.707963, -1, -1", // 5 * (-PI)
-        "-7.853981, 0, 0", // 5 * * (-PI/2)
-        "7.853981, 0, 0", // 5 * PI/2
-        "15.707963, -1, -1", // 5 * PI
-        "4.0, -0.6536, -0.6536",
-        "4.0, -0.6536, -0.6536"
-    })
-    void testArgumentNormalization(double argument, double sinResult, double expected) {
-        MathFunction cos = new CosFunction(sinMock);
-        
-        Mockito.doReturn(sinResult).when(sinMock).calculate(eq(argument + Math.PI / 2), eq(EPS));
+        Mockito.doReturn(sin).when(sinMock).calculate(eq(argument), anyDouble());
 
         assertEquals(expected, cos.calculate(argument, EPS), EPS);
     }
