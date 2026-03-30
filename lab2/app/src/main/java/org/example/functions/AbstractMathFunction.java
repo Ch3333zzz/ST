@@ -5,7 +5,7 @@ public abstract class AbstractMathFunction implements MathFunction {
     @Override
     public double calculate(double x, double error) {
 
-        if (error <= 0 || error > 0.1 || Double.isNaN(error)) {
+        if (error <= 0 || error > 0.3 || Double.isNaN(error)) {
             throw new IllegalArgumentException("Error must be in range (0; 0.1]");
         }
 

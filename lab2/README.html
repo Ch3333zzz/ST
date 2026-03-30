@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>README.md</title>
+	<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+	<style>
+		/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+		/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+		body {
+			font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+			font-size: var(--vscode-markdown-font-size, 14px);
+			padding: 0 26px;
+			line-height: var(--vscode-markdown-line-height, 22px);
+			word-wrap: break-word;
+		}
+
+		#code-csp-warning {
+			position: fixed;
+			top: 0;
+			right: 0;
+			color: white;
+			margin: 16px;
+			text-align: center;
+			font-size: 12px;
+			font-family: sans-serif;
+			background-color: #444444;
+			cursor: pointer;
+			padding: 6px;
+			box-shadow: 1px 1px 1px rgba(0, 0, 0, .25);
+		}
+
+		#code-csp-warning:hover {
+			text-decoration: none;
+			background-color: #007acc;
+			box-shadow: 2px 2px 2px rgba(0, 0, 0, .25);
+		}
+
+		body.scrollBeyondLastLine {
+			margin-bottom: calc(100vh - 22px);
+		}
+
+		body.showEditorSelection .code-line {
+			position: relative;
+		}
+
+		body.showEditorSelection .code-active-line:before,
+		body.showEditorSelection .code-line:hover:before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			left: -12px;
+			height: 100%;
+		}
+
+		body.showEditorSelection li.code-active-line:before,
+		body.showEditorSelection li.code-line:hover:before {
+			left: -30px;
+		}
+
+		.vscode-light.showEditorSelection .code-active-line:before {
+			border-left: 3px solid rgba(0, 0, 0, 0.15);
+		}
+
+		.vscode-light.showEditorSelection .code-line:hover:before {
+			border-left: 3px solid rgba(0, 0, 0, 0.40);
+		}
+
+		.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+			border-left: none;
+		}
+
+		.vscode-dark.showEditorSelection .code-active-line:before {
+			border-left: 3px solid rgba(255, 255, 255, 0.4);
+		}
+
+		.vscode-dark.showEditorSelection .code-line:hover:before {
+			border-left: 3px solid rgba(255, 255, 255, 0.60);
+		}
+
+		.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+			border-left: none;
+		}
+
+		.vscode-high-contrast.showEditorSelection .code-active-line:before {
+			border-left: 3px solid rgba(255, 160, 0, 0.7);
+		}
+
+		.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+			border-left: 3px solid rgba(255, 160, 0, 1);
+		}
+
+		.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+			border-left: none;
+		}
+
+		img {
+			max-width: 100%;
+			max-height: 100%;
+		}
+
+		a {
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+
+		a:focus,
+		input:focus,
+		select:focus,
+		textarea:focus {
+			outline: 1px solid -webkit-focus-ring-color;
+			outline-offset: -1px;
+		}
+
+		hr {
+			border: 0;
+			height: 2px;
+			border-bottom: 2px solid;
+		}
+
+		h1 {
+			padding-bottom: 0.3em;
+			line-height: 1.2;
+			border-bottom-width: 1px;
+			border-bottom-style: solid;
+		}
+
+		h1,
+		h2,
+		h3 {
+			font-weight: normal;
+		}
+
+		table {
+			border-collapse: collapse;
+		}
+
+		table>thead>tr>th {
+			text-align: left;
+			border-bottom: 1px solid;
+		}
+
+		table>thead>tr>th,
+		table>thead>tr>td,
+		table>tbody>tr>th,
+		table>tbody>tr>td {
+			padding: 5px 10px;
+		}
+
+		table>tbody>tr+tr>td {
+			border-top: 1px solid;
+		}
+
+		blockquote {
+			margin: 0 7px 0 5px;
+			padding: 0 16px 0 10px;
+			border-left-width: 5px;
+			border-left-style: solid;
+		}
+
+		code {
+			font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+			font-size: 1em;
+			line-height: 1.357em;
+		}
+
+		body.wordWrap pre {
+			white-space: pre-wrap;
+		}
+
+		pre:not(.hljs),
+		pre.hljs code>div {
+			padding: 16px;
+			border-radius: 3px;
+			overflow: auto;
+		}
+
+		pre code {
+			color: var(--vscode-editor-foreground);
+			tab-size: 4;
+		}
+
+		/** Theming */
+
+		.vscode-light pre {
+			background-color: rgba(220, 220, 220, 0.4);
+		}
+
+		.vscode-dark pre {
+			background-color: rgba(10, 10, 10, 0.4);
+		}
+
+		.vscode-high-contrast pre {
+			background-color: rgb(0, 0, 0);
+		}
+
+		.vscode-high-contrast h1 {
+			border-color: rgb(0, 0, 0);
+		}
+
+		.vscode-light table>thead>tr>th {
+			border-color: rgba(0, 0, 0, 0.69);
+		}
+
+		.vscode-dark table>thead>tr>th {
+			border-color: rgba(255, 255, 255, 0.69);
+		}
+
+		.vscode-light h1,
+		.vscode-light hr,
+		.vscode-light table>tbody>tr+tr>td {
+			border-color: rgba(0, 0, 0, 0.18);
+		}
+
+		.vscode-dark h1,
+		.vscode-dark hr,
+		.vscode-dark table>tbody>tr+tr>td {
+			border-color: rgba(255, 255, 255, 0.18);
+		}
+	</style>
+
+	<style>
+		/* Tomorrow Theme */
+		/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+		/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+		/* Tomorrow Comment */
+		.hljs-comment,
+		.hljs-quote {
+			color: #8e908c;
+		}
+
+		/* Tomorrow Red */
+		.hljs-variable,
+		.hljs-template-variable,
+		.hljs-tag,
+		.hljs-name,
+		.hljs-selector-id,
+		.hljs-selector-class,
+		.hljs-regexp,
+		.hljs-deletion {
+			color: #c82829;
+		}
+
+		/* Tomorrow Orange */
+		.hljs-number,
+		.hljs-built_in,
+		.hljs-builtin-name,
+		.hljs-literal,
+		.hljs-type,
+		.hljs-params,
+		.hljs-meta,
+		.hljs-link {
+			color: #f5871f;
+		}
+
+		/* Tomorrow Yellow */
+		.hljs-attribute {
+			color: #eab700;
+		}
+
+		/* Tomorrow Green */
+		.hljs-string,
+		.hljs-symbol,
+		.hljs-bullet,
+		.hljs-addition {
+			color: #718c00;
+		}
+
+		/* Tomorrow Blue */
+		.hljs-title,
+		.hljs-section {
+			color: #4271ae;
+		}
+
+		/* Tomorrow Purple */
+		.hljs-keyword,
+		.hljs-selector-tag {
+			color: #8959a8;
+		}
+
+		.hljs {
+			display: block;
+			overflow-x: auto;
+			color: #4d4d4c;
+			padding: 0.5em;
+		}
+
+		.hljs-emphasis {
+			font-style: italic;
+		}
+
+		.hljs-strong {
+			font-weight: bold;
+		}
+	</style>
+
+	<style>
+		/*
+ * Markdown PDF CSS
+ */
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+			padding: 0 12px;
+		}
+
+		pre {
+			background-color: #f8f8f8;
+			border: 1px solid #cccccc;
+			border-radius: 3px;
+			overflow-x: auto;
+			white-space: pre-wrap;
+			overflow-wrap: break-word;
+		}
+
+		pre:not(.hljs) {
+			padding: 23px;
+			line-height: 19px;
+		}
+
+		blockquote {
+			background: rgba(127, 127, 127, 0.1);
+			border-color: rgba(0, 122, 204, 0.5);
+		}
+
+		.emoji {
+			height: 1.4em;
+		}
+
+		code {
+			font-size: 14px;
+			line-height: 19px;
+		}
+
+		/* for inline code */
+		:not(pre):not(.hljs)>code {
+			color: #C9AE75;
+			/* Change the old color so it seems less like an error */
+			font-size: inherit;
+		}
+
+		/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+		.page {
+			page-break-after: always;
+		}
+	</style>
+
+	<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+
+<body>
+	<script>
+		mermaid.initialize({
+			startOnLoad: true,
+			theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+				? 'dark'
+				: 'default'
+		});
+	</script>
+	<h1
+		id="%D0%BB%D0%B0%D0%B1%D0%BE%D1%80%D0%B0%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%E2%84%962">
+		Лабораторная работа №2</h1>
+	<h2 id="%D0%B2%D0%B0%D1%80%D0%B8%D0%B0%D0%BD%D1%82-4546719">Вариант 4546719</h2>
+	<ul>
+		<li>Сделал: Козьяков Арсений Дмитриевич</li>
+		<li>Проверил: Наумова Надежда Александровна</li>
+	</ul>
+	<h2 id="%D0%B7%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5">Задание</h2>
+	<p>Провести интеграционное тестирование программы, осуществляющей вычисление системы функций (в соответствии с
+		вариантом).
+		<img src="/static/system.png" alt="system">
+	</p>
+	<h2 id="%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0">Правила</h2>
+	<ol>
+		<li>Все составляющие систему функции (как тригонометрические, так и логарифмические) должны быть выражены через
+			базовые (тригонометрическая зависит от варианта; логарифмическая - натуральный логарифм).</li>
+		<li>Структура приложения, тестируемого в рамках лабораторной работы, должна выглядеть следующим образом (пример
+			приведён для базовой тригонометрической функции sin(x)):
+			<img src="/static/scheme.png" alt="scheme">
+		</li>
+		<li>Обе &quot;базовые&quot; функции (в примере выше - sin(x) и ln(x)) должны быть реализованы при помощи
+			разложения в ряд с задаваемой погрешностью. Использовать тригонометрические / логарифмические преобразования
+			для упрощения функций ЗАПРЕЩЕНО.</li>
+		<li>Для КАЖДОГО модуля должны быть реализованы табличные заглушки. При этом, необходимо найти область допустимых
+			значений функций, и, при необходимости, определить взаимозависимые точки в модулях.</li>
+		<li>Разработанное приложение должно позволять выводить значения, выдаваемое любым модулем системы, в сsv файл
+			вида «X, Результаты модуля (X)», позволяющее произвольно менять шаг наращивания Х. Разделитель в файле csv
+			можно использовать произвольный.</li>
+	</ol>
+	<h2
+		id="%D0%BF%D0%BE%D1%80%D1%8F%D0%B4%D0%BE%D0%BA-%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B">
+		Порядок выполнения работы</h2>
+	<ol>
+		<li>Разработать приложение, руководствуясь приведёнными выше правилами.</li>
+		<li>С помощью JUNIT5 разработать тестовое покрытие системы функций, проведя анализ эквивалентности и учитывая
+			особенности системы функций. Для анализа особенностей системы функций и составляющих ее частей можно
+			использовать сайт <a href="https://www.wolframalpha.com/">https://www.wolframalpha.com/</a>.</li>
+		<li>Собрать приложение, состоящее из заглушек. Провести интеграцию приложения по 1 модулю, с обоснованием
+			стратегии интеграции, проведением интеграционных тестов и контролем тестового покрытия системы функций.</li>
+	</ol>
+	<h2 id="%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5">Выполение</h2>
+	<p>В качестве тестового покрытия я выбрал ОДЗ функций, а также их экстремумы.
+		Стратегия тестирования - сверху вниз, поскольку эта стратегия позволяет тестировать приложение, используя
+		прототип конечного решения, а также тестирование этой стратегией удобно в иерархии классов данной лабораторной
+		работы.</p>
+	<h3 id="%D0%B1%D0%B0%D0%B7%D0%BE%D0%B2%D1%8B%D0%B5-%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8">Базовые функции</h3>
+	<h4 id="sinx">sin(x)</h4>
+	<p>ОДЗ - R (все вещественные числа)
+		<img src="/static/sin.png" alt="sin">
+		Проверяемые точки
+		<img src="/static/check_points_sin.png" alt="check_points">
+	</p>
+	<h4 id="lnx">ln(x)</h4>
+	<p>ОДЗ - x &gt; 0
+		<img src="/static/ln.png" alt="ln">
+		Проверяемые точки
+		<img src="/static/check_points_ln.png" alt="check_points">
+	</p>
+	<h3 id="%D0%BE%D1%81%D1%82%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5-%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8">Остальные
+		функции</h3>
+	<h4 id="cosx">cos(x)</h4>
+	<p>ОДЗ - R
+		<img src="/static/cos.png" alt="cos">
+		Проверяемые точки
+		<img src="/static/check_points_cos.png" alt="check_points">
+	</p>
+	<h4 id="tanx">tan(x)</h4>
+	<p>ОДЗ - R, кроме +-pi/2 + pi*n, n - целое
+		<img src="/static/tan.png" alt="tan">
+		Проверяемые точки
+		<img src="/static/check_points_tan.png" alt="check_points">
+	</p>
+	<h4 id="cotx">cot(x)</h4>
+	<p>ОДЗ - R, кроме pi*n, n - целое
+		<img src="/static/cot.png" alt="cot">
+		Проверяемые точки
+		<img src="/static/check_points_cot.png" alt="check_points">
+	</p>
+	<h4 id="secx">sec(x)</h4>
+	<p>ОДЗ - R, кроме +-pi/2 + pi*n, n - целое
+		<img src="/static/sec.png" alt="sec">
+		Проверяемые точки
+		<img src="/static/check_points_sec.png" alt="check_points">
+	</p>
+	<h4 id="cscx">csc(x)</h4>
+	<p>ОДЗ - R, кроме pi*n, n - целое
+		<img src="/static/csc.png" alt="csc">
+		Проверяемые точки
+		<img src="/static/check_points_csc.png" alt="check_points">
+	</p>
+	<h4 id="log2x">log2(x)</h4>
+	<p>ОДЗ x &gt; 0
+		<img src="/static/log2.png" alt="csc">
+		Проверяемые точки (для всех логарифмов одинаковые)
+		<img src="/static/check_points_log_arg.png" alt="check_points">
+		Проверяемые точки при задавании базы
+		<img src="/static/check_points_log_base.png" alt="check_points">
+	</p>
+	<h4 id="log3x">log3(x)</h4>
+	<p>ОДЗ x &gt; 0
+		<img src="/static/log3.png" alt="csc">
+	</p>
+	<h4 id="log5x">log5(x)</h4>
+	<p>ОДЗ x &gt; 0
+		<img src="/static/log5.png" alt="csc">
+	</p>
+	<h3 id="%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0">Система</h3>
+	<p>ОДЗ - R, кроме pi*n, +-pi/2 + pi*n, n &lt; 0 и целое
+		<img src="/static/sys_graph.png" alt="system">
+		Проверяемые точки
+		<img src="/static/check_points_system_left.png" alt="check_points">
+		<img src="/static/check_points_system_right.png" alt="check_points">
+	</p>
+	<p>из Desmos
+		<img src="/static/sys_desmos.png" alt="sys_desmos">
+	</p>
+	<p><b>Примечание:</b>
+		Графики отличаются c реальными только в точках разрыва - графики рисовались exel и в точке разрыва (не из ОДЗ)
+		он соединял две соседние точки.
+		// добавить точки, тестирование сверху вниз</p>
+	<h3 id="uml-%D0%B4%D0%B8%D0%B0%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0-%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%BE%D0%B2">
+		UML-диаграмма классов</h3>
+	<p><img src="/static/uml.png" alt="uml"></p>
+	<h3 id="%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4">Вывод</h3>
+	<p>Я научился производить интеграционное тестирование, научился использовать Mockito для использования заглушек.</p>
+
+</body>
+
+</html>

@@ -7,10 +7,11 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import org.example.functions.MathFunction;
 import org.example.functions.trigonometry.TanFunction;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,15 +26,15 @@ public class TanFunctionTest {
 
     private final double EPS = 0.001;
 
-    @ParameterizedTest(name = "Checking division by zero")
-    @ValueSource(doubles = {1.570796, -1.570796, 4.712389, -4.712389})
-    void testDivisionByZero(double argument) {
+    @Test
+    @DisplayName("Devision by 0")
+    void testDivisionByZero() {
         MathFunction tan = new TanFunction(sinMock, cosMock);
         
-        Mockito.doReturn(0.0).when(cosMock).calculate(eq(argument), anyDouble());
-        Mockito.doReturn(1.0).when(sinMock).calculate(eq(argument), anyDouble());
+        Mockito.doReturn(0.0).when(cosMock).calculate(anyDouble(), anyDouble());
+        Mockito.doReturn(1.0).when(sinMock).calculate(anyDouble(), anyDouble());
 
-        double result = tan.calculate(argument, EPS);
+        double result = tan.calculate(123.0, EPS);
         assertTrue(Double.isNaN(result));
     }
 

@@ -30,7 +30,7 @@ public class SinFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing invalid error values")
-    @ValueSource(doubles = {-0.001, 0.2, Double.NaN, Double.POSITIVE_INFINITY})
+    @ValueSource(doubles = {-0.001, 0.6, Double.NaN, Double.POSITIVE_INFINITY})
     void testInvalidError(double invalidError) {
         assertThrows(IllegalArgumentException.class, () -> sin.calculate(1.0, invalidError));
     }

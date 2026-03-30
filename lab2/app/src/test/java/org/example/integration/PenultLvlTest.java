@@ -1,4 +1,4 @@
-package org.example.module;
+package org.example.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,6 +7,13 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import org.example.functions.MathFunction;
 import org.example.functions.SystemFunction;
+import org.example.functions.logarifms.LnFunction;
+import org.example.functions.logarifms.LogFunction;
+import org.example.functions.trigonometry.CosFunction;
+import org.example.functions.trigonometry.CotFuntion;
+import org.example.functions.trigonometry.CscFunction;
+import org.example.functions.trigonometry.SecFunction;
+import org.example.functions.trigonometry.TanFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,28 +25,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class SystemFunctionTest {
+public class PenultLvlTest {
     
     @Mock
-    private MathFunction sin;
-    @Mock
-    private MathFunction cos;
-    @Mock
-    private MathFunction tan;
-    @Mock
-    private MathFunction cot;
-    @Mock
-    private MathFunction sec;
-    @Mock
-    private MathFunction csc;
+    private MathFunction sinMock;
 
-    @Mock
+    private MathFunction cos;
+    private MathFunction csc;
+    private MathFunction tan;
+    private MathFunction cot;
+    private MathFunction sec;
+
     private MathFunction ln;
-    @Mock
     private MathFunction log2;
-    @Mock
     private MathFunction log3;
-    @Mock
     private MathFunction log5;
 
     private SystemFunction system;
@@ -48,7 +47,19 @@ public class SystemFunctionTest {
 
     @BeforeEach
     void setUp() {
-        system = new SystemFunction(sin, cos, tan, cot, sec, csc, ln, log2, log3, log5);
+
+        cos = new CosFunction(sinMock);
+        csc = new CscFunction(sinMock);
+        tan = new TanFunction(sinMock, cos);
+        cot = new CotFuntion(cos, sinMock);
+        sec = new SecFunction(cos);
+
+        ln = new LnFunction();
+        log2 = new LogFunction(ln, 2);
+        log3 = new LogFunction(ln, 3);
+        log5 = new LogFunction(ln, 5);
+
+        system = new SystemFunction(sinMock, cos, tan, cot, sec, csc, ln, log2, log3, log5);
     }
 
 
@@ -60,13 +71,8 @@ public class SystemFunctionTest {
         -4.712389, -10.995574             // -3PI/2 -7PI/2
     })
     void testAsymptotes(double x) {
-        Mockito.when(sin.calculate(eq(x), anyDouble())).thenReturn(0.0);
-        Mockito.when(cos.calculate(eq(x), anyDouble())).thenReturn(0.0);
-        
-        Mockito.when(tan.calculate(eq(x), anyDouble())).thenReturn(Double.NaN);
-        Mockito.when(csc.calculate(eq(x), anyDouble())).thenReturn(Double.NaN);
-        Mockito.when(sec.calculate(eq(x), anyDouble())).thenReturn(Double.NaN);
-        Mockito.when(cot.calculate(eq(x), anyDouble())).thenReturn(Double.NaN);
+        Mockito.when(sinMock.calculate(eq(x), anyDouble())).thenReturn(0.0);
+
         double result = system.calculate(x, EPS);
         assertTrue(Double.isNaN(result));
     }
@@ -80,16 +86,11 @@ public class SystemFunctionTest {
 
     @ParameterizedTest(name = "Testing between bad points")
     @CsvFileSource(resources = "/system_left.csv", numLinesToSkip = 1)
-    void testTrigIntervalsFullIsolation(double x, double expected, 
+    void testTrigIntervals(double x, double expected, 
                                         double eSin, double eCos, double eTan, 
                                         double eCot, double eSec, double eCsc) {
 
-        Mockito.when(sin.calculate(eq(x), anyDouble())).thenReturn(eSin);
-        Mockito.when(cos.calculate(eq(x), anyDouble())).thenReturn(eCos);
-        Mockito.when(tan.calculate(eq(x), anyDouble())).thenReturn(eTan);
-        Mockito.when(cot.calculate(eq(x), anyDouble())).thenReturn(eCot);
-        Mockito.when(sec.calculate(eq(x), anyDouble())).thenReturn(eSec);
-        Mockito.when(csc.calculate(eq(x), anyDouble())).thenReturn(eCsc);
+        Mockito.when(sinMock.calculate(eq(x), anyDouble())).thenReturn(eSin);
 
         double result = system.calculate(x, EPS);
 
@@ -102,9 +103,6 @@ public class SystemFunctionTest {
         "1, 0"
     })
     void testLogPartBadDots(double x, double eLog2) {
-
-        Mockito.when(log2.calculate(eq(x), anyDouble())).thenReturn(eLog2);
-
         double result = system.calculate(x, EPS);
 
         assertTrue(Double.isNaN(result));
@@ -112,14 +110,8 @@ public class SystemFunctionTest {
 
     @ParameterizedTest(name = "Log part good points check")
     @CsvFileSource(resources = "/system_right.csv", numLinesToSkip = 1)
-    void testLogPartFullIsolation(double x, double expected, 
-                                double eLn, double eLog2, 
-                                double eLog3, double eLog5) {
-
-        Mockito.when(ln.calculate(eq(x), anyDouble())).thenReturn(eLn);
-        Mockito.when(log2.calculate(eq(x), anyDouble())).thenReturn(eLog2);
-        Mockito.when(log3.calculate(eq(x), anyDouble())).thenReturn(eLog3);
-        Mockito.when(log5.calculate(eq(x), anyDouble())).thenReturn(eLog5);
+    void testLogPart(double x, double expected, 
+                                double eLn) {
 
         double result = system.calculate(x, EPS);
 

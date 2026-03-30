@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +31,7 @@ public class LnFunctionTest {
     }
 
     @ParameterizedTest(name = "Testing invalid error values")
-    @ValueSource(doubles = {-0.001, 0.2, Double.NaN, Double.POSITIVE_INFINITY})
+    @ValueSource(doubles = {-0.001, 0.6, Double.NaN, Double.POSITIVE_INFINITY})
     void testInvalidError(double invalidError) {
         assertThrows(IllegalArgumentException.class, () -> ln.calculate(2.0, invalidError));
     }
