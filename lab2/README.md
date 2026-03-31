@@ -8,13 +8,13 @@
 ## Задание
 
 Провести интеграционное тестирование программы, осуществляющей вычисление системы функций (в соответствии с вариантом).
-![system](/lab2/static/system.png)
+![system](./static/system.png)
 
 ## Правила
 
 1. Все составляющие систему функции (как тригонометрические, так и логарифмические) должны быть выражены через базовые (тригонометрическая зависит от варианта; логарифмическая - натуральный логарифм).
 2. Структура приложения, тестируемого в рамках лабораторной работы, должна выглядеть следующим образом (пример приведён для базовой тригонометрической функции sin(x)):
-![scheme](/lab2/static/scheme.png)
+![scheme](./static/scheme.png)
 3. Обе "базовые" функции (в примере выше - sin(x) и ln(x)) должны быть реализованы при помощи разложения в ряд с задаваемой погрешностью. Использовать тригонометрические / логарифмические преобразования для упрощения функций ЗАПРЕЩЕНО.
 4. Для КАЖДОГО модуля должны быть реализованы табличные заглушки. При этом, необходимо найти область допустимых значений функций, и, при необходимости, определить взаимозависимые точки в модулях.
 5. Разработанное приложение должно позволять выводить значения, выдаваемое любым модулем системы, в сsv файл вида «X, Результаты модуля (X)», позволяющее произвольно менять шаг наращивания Х. Разделитель в файле csv можно использовать произвольный.
@@ -35,91 +35,90 @@
 #### sin(x)
 
 ОДЗ - R (все вещественные числа)
-![sin](/lab2/static/sin.png)
+![sin](./static/sin.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_sin.png)
+![check_points](./static/check_points_sin.png)
 
 #### ln(x)
 
 ОДЗ - x > 0
-![ln](/lab2/static/ln.png)
+![ln](./static/ln.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_ln.png)
+![check_points](./static/check_points_ln.png)
 
 ### Остальные функции
 
 #### cos(x)
 
 ОДЗ - R
-![cos](/lab2/static/cos.png)
+![cos](./static/cos.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_cos.png)
+![check_points](./static/check_points_cos.png)
 
 #### tan(x)
 
 ОДЗ - R, кроме +-pi/2 + pi*n, n - целое
-![tan](/lab2/static/tan.png)
+![tan](./static/tan.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_tan.png)
+![check_points](./static/check_points_tan.png)
 
 #### cot(x)
 
 ОДЗ - R, кроме pi*n, n - целое
-![cot](/lab2/static/cot.png)
+![cot](./static/cot.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_cot.png)
+![check_points](./static/check_points_cot.png)
 
 #### sec(x)
 
 ОДЗ - R, кроме +-pi/2 + pi*n, n - целое
-![sec](/lab2/static/sec.png)
+![sec](./static/sec.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_sec.png)
+![check_points](./static/check_points_sec.png)
 
 #### csc(x)
 
 ОДЗ - R, кроме pi*n, n - целое
-![csc](/lab2/static/csc.png)
+![csc](./static/csc.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_csc.png)
+![check_points](./static/check_points_csc.png)
 
 #### log2(x)
 
 ОДЗ x > 0
-![csc](/lab2/static/log2.png)
+![csc](./static/log2.png)
 Проверяемые точки (для всех логарифмов одинаковые)
-![check_points](/lab2/static/check_points_log_arg.png)
+![check_points](./static/check_points_log_arg.png)
 Проверяемые точки при задавании базы
-![check_points](/lab2/static/check_points_log_base.png)
+![check_points](./static/check_points_log_base.png)
 
 #### log3(x)
 
 ОДЗ x > 0
-![csc](/lab2/static/log3.png)
+![csc](./static/log3.png)
 
 #### log5(x)
 
 ОДЗ x > 0
-![csc](/lab2/static/log5.png)
+![csc](./static/log5.png)
 
 ### Система
 
 ОДЗ - R, кроме pi\*n, +-pi/2 + pi\*n, n < 0 и целое
-![system](/lab2/static/sys_graph.png)
+![system](./static/sys_graph.png)
 Проверяемые точки
-![check_points](/lab2/static/check_points_system_left.png)
-![check_points](/lab2/static/check_points_system_right.png)
+![check_points](./static/check_points_system_left.png)
+![check_points](./static/check_points_system_right.png)
 
 из Desmos
-![sys_desmos](/lab2/static/sys_desmos.png)
+![sys_desmos](./static/sys_desmos.png)
 
 **Примечание:**
 Графики отличаются c реальными только в точках разрыва - графики рисовались exel и в точке разрыва (не из ОДЗ) он соединял две соседние точки.
- // добавить точки, тестирование сверху вниз
 
 ### UML-диаграмма классов
 
-![uml](/lab2/static/uml.png)
+![uml](./static/uml.png)
 
 ### Код программы
 
