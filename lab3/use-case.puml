@@ -1,0 +1,86 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Пользователь" as user
+actor "Платежная система" as payment_system
+
+rectangle "Tutu.ru" {
+  usecase "Оплатить заказ" as pay
+  usecase "Ввести данные для поиска" as search_data
+  usecase "Посмотреть отзывы" as reviews
+  usecase "Выбрать фильтры" as filters
+  usecase "Заполнить данные пассажиров/гостей" as p_info
+  usecase "Добавить дополнительные услуги" as additional_services
+  
+  usecase "Забронировать номер отеля" as book_hotel
+  usecase "Купить авиабилет" as buy_flight
+  usecase "Купить ж/д билет" as buy_train
+  usecase "Купить билет на автобус" as buy_bus
+  usecase "Посмотреть расписание электричек" as check_sched
+  usecase "Купить тур" as buy_tour
+  usecase "Арендовать авто" as rent_auto
+
+  usecase "Выбрать отель" as select_hotel
+  usecase "Выбрать отель из предложенных" as select_from_list
+  usecase "Выбрать номер отеля" as select_room
+  usecase "Ввести точное название отеля" as search_by_name
+
+  usecase "Выбрать билет из каталога" as select_ticket
+  usecase "Выбрать поезд из каталога" as select_train
+  usecase "Выбрать автобус из каталога" as select_bus
+  usecase "Выбрать машину из каталога" as select_car
+
+  user --> book_hotel
+  user --> buy_flight
+  user --> buy_train
+  user --> buy_bus
+  user --> check_sched
+  user --> buy_tour
+  user --> rent_auto
+
+  additional_services ..> pay : <<extend>>  
+
+  book_hotel ..> pay : <<include>>
+  book_hotel ..> p_info : <<include>>
+  book_hotel ..> select_room : <<include>>
+  select_room ..> select_hotel : <<include>>
+  
+  search_by_name --|> select_hotel
+  select_from_list --|> select_hotel
+  select_from_list ..> search_data : <<include>>
+  reviews ..> select_hotel : <<extend>>
+  filters ..> select_from_list : <<extend>>
+
+  buy_flight ..> pay : <<include>>
+  buy_flight ..> select_ticket : <<include>>
+  buy_flight ..> p_info : <<include>>
+  select_ticket ..> search_data : <<include>>
+
+  buy_train ..> pay : <<include>>
+  buy_train ..> select_train : <<include>>
+  buy_train ..> p_info : <<include>>
+  select_train ..> search_data : <<include>>
+
+  buy_bus ..> pay : <<include>>
+  buy_bus ..> select_bus : <<include>>
+  buy_bus ..> p_info : <<include>>
+
+  buy_tour ..> pay : <<include>>
+  buy_tour ..> p_info : <<include>>
+  
+  rent_auto ..> pay : <<include>>
+  rent_auto ..> select_car : <<include>>
+
+  buy_tour ..> select_hotel : <<include>>
+  buy_tour ..> select_ticket : <<include>>
+  
+  (Посмотреть дополнительную информацию о туре) ..> buy_tour : <<extend>>
+
+  ' Общая логика поиска
+  select_hotel ..> search_data : <<include>>
+  select_ticket ..> search_data : <<include>>
+
+  pay --> payment_system
+}
+@enduml
