@@ -1,392 +1,241 @@
 package org.example.pages;
 
-import org.example.PropertyReader;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+import org.example.PropertyReader;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 public class MainPage {
     private final WebDriver driver;
-    private final  WebDriverWait wait;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private final WebDriverWait wait;
+    private final DateTimeFormatter formatter =
+    DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    //hotel
-    private final By hotelButton = getByWithProperty("xpath.hotelButton");
-    private final By hotelWhereField = getByWithProperty("xpath.hotelWhereField");
-    private final By hotelWhenField = getByWithProperty("xpath.hotelWhenField");
-    private final By caledarNextBottun = getByWithProperty("xpath.hotelNextMonth");
-    private final By hotelChooseDate = getByWithProperty("xpath.hotelChooseDate");
-    private final By hotelSelectGuests = getByWithProperty("xpath.hotelSelectGuests");
-    private final By hotelDecreaseGuests = getByWithProperty("xpath.hotelDecreaseGuests");
-    private final By hotelIncreaseGuests = getByWithProperty("xpath.hotelIncreaseGuests");
-    private final By addChildButton = getByWithProperty("xpath.addChildButton");
-    private final By searchHotelButton = getByWithProperty("xpath.searchHotelButton");
+    private final CalendarComponent calendar = new CalendarComponent();
+    private final LocationComponent lComponent = new LocationComponent();
+    private final PassengerComponent pComponent = new PassengerComponent();
+    private final NightsComponent nComponent = new NightsComponent();
 
-    //airplaines
-    private final By airplanesButton = getByWithProperty("xpath.airplanesButton");
-    private final By airplanesFrom = getByWithProperty("xpath.airplanesFrom");
-    private final By airplanesTo = getByWithProperty("xpath.airplanesTo");
-    private final By airplaintChooseWhenTo = getByWithProperty("xpath.airplaintChooseWhenTo");
-    private final By airplanesPassagers = getByWithProperty("xpath.airplanesPassagers");
-    private final By searchAirplanes = getByWithProperty("xpath.searchAirplanes");
+    private final By searchButton = getByWithProperty("xpath.searchButton");
 
     public MainPage(WebDriver driver) {
         this.driver = driver;
-
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    public void SelectCityFromList(int i) {
-        if (i <= 0) throw new IllegalArgumentException("Count cities starting from one!");
-
-        wait.until(ExpectedConditions.elementToBeClickable(hotelButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(hotelWhereField)).click();
-
-        String arg = "(//div[@data-ti='dropdown-item'])[%d]".formatted(i);
-        By selectedCity = By.xpath(arg);
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(selectedCity)).click();
+    public void selectDate(String date) {
+        calendar.selectDate(date);
     }
 
-    public void SearchCityByName(String city) {
-        if (city == null)
-            throw new IllegalArgumentException("city can't be null!");
-
-        wait.until(ExpectedConditions.elementToBeClickable(hotelButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(hotelWhereField)).click();
-
-        WebElement inputField = wait.until(ExpectedConditions.elementToBeClickable(hotelWhereField));
-
-        inputField.clear();
-        inputField.sendKeys(city + Keys.ENTER);
+    public void selectDates(String firstDate, String secondDate) {
+        calendar.selectDates(firstDate, secondDate);
     }
 
-    public void SelectDates(String FirstDate, String SecondDate) {
-        if (FirstDate == null || SecondDate == null)
-            throw new IllegalArgumentException("Dates cannot be null");
-
-        LocalDate dateFrom = LocalDate.parse(FirstDate, formatter);
-        LocalDate dateTo = LocalDate.parse(SecondDate, formatter);
-
-        long daysBetween = ChronoUnit.DAYS.between(dateFrom, dateTo);
-
-        if (daysBetween > 30)
-            throw new IllegalArgumentException("Difference between days can't be more than 30");
-        
-        if (dateFrom.isAfter(dateTo))
-            throw new IllegalArgumentException("First date must be earlier than second");
-        if (dateFrom.isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("First date cannot be in the past");
-
-        wait.until(ExpectedConditions.elementToBeClickable(hotelButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(hotelWhenField)).click();
-
-        String monthContainerXpath = "//div[@data-month-date='%s']";
-        String dayXpathTemplate = "//div[@data-month-date='%s']//span[text()='%d']";
-
-        String fromMonthValue = FirstDate.substring(3); // "MM.yyyy"
-        
-        while (driver.findElements(By.xpath(monthContainerXpath.formatted(fromMonthValue))).isEmpty()) {
-            WebElement nextBtn = wait.until(ExpectedConditions.elementToBeClickable(caledarNextBottun));
-            nextBtn.click();
-            
-            wait.until(ExpectedConditions.stalenessOf(nextBtn)); 
-        }
-
-        By buttonFromDay = By.xpath(dayXpathTemplate.formatted(fromMonthValue, dateFrom.getDayOfMonth()));
-        wait.until(ExpectedConditions.elementToBeClickable(buttonFromDay)).click();
-
-        String toMonthValue = SecondDate.substring(3); // "MM.yyyy"
-
-        while (driver.findElements(By.xpath(monthContainerXpath.formatted(toMonthValue))).isEmpty()) {
-            WebElement nextBtn = wait.until(ExpectedConditions.elementToBeClickable(caledarNextBottun));
-            nextBtn.click();
-            
-            wait.until(ExpectedConditions.presenceOfElementLocated(caledarNextBottun));
-        }
-
-        By buttonToDay = By.xpath(dayXpathTemplate.formatted(toMonthValue, dateTo.getDayOfMonth()));
-        wait.until(ExpectedConditions.elementToBeClickable(buttonToDay)).click();
-
-        wait.until(ExpectedConditions.elementToBeClickable(hotelChooseDate)).click();
+    public void inputFirstDuration(String duration) {
+        lComponent.inputFirstDuration(duration);
     }
 
-    public void SelectGuests(short adult, float[] kids) {
-        if (adult < 1 || adult > 6)
-            throw new IllegalArgumentException("Adults count must be between 1 and 6");
-        if (kids != null && kids.length > 4)
-            throw new IllegalArgumentException("Kids count can't be more than 4");
-
-        for (float kidAge : kids) {
-            if (kidAge > 18 || kidAge < 0)
-                throw new IllegalArgumentException("Age of kids must be lower, than 18 and positive");
-        }
-        wait.until(ExpectedConditions.elementToBeClickable(hotelButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(hotelSelectGuests)).click();
-
-
-        By adultCountLocator = By.xpath("//div[@data-ti='count']"); 
-
-        while (true) {
-            String currentText = wait.until(ExpectedConditions.visibilityOfElementLocated(adultCountLocator)).getText();
-            int currentAdults = Integer.parseInt(currentText);
-
-            if (currentAdults == adult) {
-                break;
-            } 
-            
-            if (currentAdults < adult) {
-                driver.findElement(hotelIncreaseGuests).click();
-            } else {
-                driver.findElement(hotelDecreaseGuests).click();
-            }
-            
-            wait.until(ExpectedConditions.not(ExpectedConditions.textToBe(adultCountLocator, currentText)));
-        }
-
-        if (kids != null && kids.length > 0) {
-            for (float kidAge : kids) {
-                wait.until(ExpectedConditions.elementToBeClickable(addChildButton)).click();
-                
-            int roundedAge = (int) kidAge;
-            String suffix = (roundedAge == 1) ? "год" : (roundedAge >= 2 && roundedAge <= 4) ? "года" : "лет";
-
-            String xpath;
-            if (kidAge < 1) {
-                xpath = "//div[@data-ti='dropdown-item']//span[contains(., 'Меньше')]";
-            } else {
-                xpath = "//div[@data-ti='dropdown-item']//span[contains(., '%d') and contains(., '%s')]".formatted(roundedAge, suffix);
-            }
-
-            By ageOption = By.xpath(xpath);
-            wait.until(ExpectedConditions.elementToBeClickable(ageOption)).click();
-            }
-        }
+    public void inputSecondDuration(String duration) {
+        lComponent.inputSecondDuration(duration);
     }
 
-    public void searchHotel(int i, String dateFrom, String dateTo, short adult, float[] kids) {
-        SelectCityFromList(i);
-        SelectDates(dateTo, dateTo);
-        SelectGuests(adult, kids);
-
-        wait.until(ExpectedConditions.elementToBeClickable(searchHotelButton)).click();
+    public void setAdults(int count) {
+        pComponent.setAdults(count);
     }
 
-    public void searchHotel(String city, String dateFrom, String dateTo, short adult, float[] kids) {
-        SearchCityByName(city);
-        SelectDates(dateTo, dateTo);
-        SelectGuests(adult, kids);
-
-        wait.until(ExpectedConditions.elementToBeClickable(searchHotelButton)).click();
+    public void addChildren(String... ages) {
+        pComponent.addChildren(ages);
     }
 
-    public void selectFromAirplanes(int i) {
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesFrom)).clear();
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesFrom)).click();
-
-        String arg = "(//div[@data-ti='dropdown-item'])[%d]".formatted(i);
-        By selectedFrom = By.xpath(arg);
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(selectedFrom)).click();
+    public void setTravelClass(String travelClass) {
+        pComponent.setTravelClass(travelClass);
     }
 
-    public void searchFromAirplanesByName(String city) {
-        if (city == null)
-            throw new IllegalArgumentException("city can't be null!");
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesFrom)).click();
-
-        WebElement inputField = wait.until(ExpectedConditions.elementToBeClickable(airplanesFrom));
-
-        inputField.clear();
-        inputField.sendKeys(city + Keys.ENTER);
+    public void setNightsRange(int from, int to) {
+        nComponent.setNightsRange(from, to);
     }
 
 
-    public void selectToAirplanes(int i) {
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesTo)).clear();
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesTo)).click();
-
-        String arg = "(//div[@data-ti='dropdown-item'])[%d]".formatted(i);
-        By selectedFrom = By.xpath(arg);
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(selectedFrom)).click();
+    public void search() {
+        wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
     }
-
-    public void searchToAirplanesByName(String city) {
-        if (city == null)
-            throw new IllegalArgumentException("city can't be null!");
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesTo)).click();
-
-        WebElement inputField = wait.until(ExpectedConditions.elementToBeClickable(airplanesTo));
-
-        inputField.clear();
-        inputField.sendKeys(city + Keys.ENTER);
-    }
-
-    public void selectDatesAirplain(String FirstDate, String SecondDate) {
-        if (FirstDate == null)
-            throw new IllegalArgumentException("First date cannot be null");
-
-        LocalDate dateFrom = LocalDate.parse(FirstDate, formatter);
-        if (dateFrom.isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("First date cannot be in the past");
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(airplaintChooseWhenTo)).click();
-
-        String monthContainerXpath = "//div[@data-month-date='%s']";
-        String dayXpathTemplate = "//div[@data-month-date='%s']//span[text()='%d']";
-
-        String fromMonthValue = FirstDate.substring(3); // "MM.yyyy"
-
-        By submitButton = By.xpath("//button[@data-ti='calendar-popper-footer-select-button']");
-
-        
-        while (driver.findElements(By.xpath(monthContainerXpath.formatted(fromMonthValue))).isEmpty()) {
-            WebElement nextBtn = wait.until(ExpectedConditions.elementToBeClickable(caledarNextBottun));
-            nextBtn.click();
-            
-            wait.until(ExpectedConditions.stalenessOf(nextBtn)); 
-        }
-
-        By buttonFromDay = By.xpath(dayXpathTemplate.formatted(fromMonthValue, dateFrom.getDayOfMonth()));
-        wait.until(ExpectedConditions.elementToBeClickable(buttonFromDay)).click();
-
-        if (SecondDate == null) {
-            wait.until(ExpectedConditions.elementToBeClickable(submitButton)).click();
-            return;
-        }
-
-        LocalDate dateTo = LocalDate.parse(SecondDate, formatter);
-        
-        if (dateFrom.isAfter(dateTo))
-            throw new IllegalArgumentException("First date must be earlier than second");
-
-
-        String toMonthValue = SecondDate.substring(3); // "MM.yyyy"
-
-        while (driver.findElements(By.xpath(monthContainerXpath.formatted(toMonthValue))).isEmpty()) {
-            WebElement nextBtn = wait.until(ExpectedConditions.elementToBeClickable(caledarNextBottun));
-            nextBtn.click();
-            
-            wait.until(ExpectedConditions.presenceOfElementLocated(caledarNextBottun));
-        }
-
-        By buttonToDay = By.xpath(dayXpathTemplate.formatted(toMonthValue, dateTo.getDayOfMonth()));
-        wait.until(ExpectedConditions.elementToBeClickable(buttonToDay)).click();
-
-        wait.until(ExpectedConditions.elementToBeClickable(submitButton)).click();
-    }
-
-    public void selectPassagersForAirplain(short adult, float[] kids) {
-        if (adult + kids.length > 9)
-            throw new IllegalArgumentException("Max people is 9");
-
-        int babyCount = 0;
-        for (float kidAge : kids) {
-            if (kidAge > 12 || kidAge < 0)
-                throw new IllegalArgumentException("Age of kids must be lower, than 18 and positive");
-            if (kidAge < 2)
-                babyCount++;
-        }
-        if (babyCount > adult)
-            throw new IllegalArgumentException("Baby count can't be bigger, than adult count");
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesPassagers)).click();
-
-
-        By adultCountLocator = By.xpath("//div[@data-ti='count']"); 
-
-        while (true) {
-            String currentText = wait.until(ExpectedConditions.visibilityOfElementLocated(adultCountLocator)).getText();
-            int currentAdults = Integer.parseInt(currentText);
-
-            if (currentAdults == adult) {
-                break;
-            } 
-            
-            if (currentAdults < adult) {
-                driver.findElement(hotelIncreaseGuests).click();
-            } else {
-                driver.findElement(hotelDecreaseGuests).click();
-            }
-            
-            wait.until(ExpectedConditions.not(ExpectedConditions.textToBe(adultCountLocator, currentText)));
-        }
-
-        if (kids != null && kids.length > 0) {
-            for (float kidAge : kids) {
-                wait.until(ExpectedConditions.elementToBeClickable(addChildButton)).click();
-                
-            int roundedAge = (int) kidAge;
-            String suffix = (roundedAge == 1) ? "год" : (roundedAge >= 2 && roundedAge <= 4) ? "года" : "лет";
-
-            String xpath;
-            if (kidAge < 1) {
-                xpath = "//div[@data-ti='dropdown-item']//span[contains(., 'Меньше')]";
-            } else {
-                xpath = "//div[@data-ti='dropdown-item']//span[contains(., '%d') and contains(., '%s')]".formatted(roundedAge, suffix);
-            }
-
-            By ageOption = By.xpath(xpath);
-            wait.until(ExpectedConditions.elementToBeClickable(ageOption)).click();
-            }
-        }
-    }
-
-    public void selectBuisnessClass() {
-
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(airplanesPassagers)).click();
-
-        By buisness = By.xpath("(//button[@data-ti='segment_control_button'])[2]");
-
-        wait.until(ExpectedConditions.elementToBeClickable(buisness)).click();
-
-    }
-
-    public void searchAirplaneDefault(int i, int j, String firstDate, String secondDate, short adult, float[] kids) {
-        selectFromAirplanes(i);
-        selectToAirplanes(j);
-        selectDatesAirplain(firstDate, secondDate);
-        selectPassagersForAirplain(adult, kids);
-
-        wait.until(ExpectedConditions.elementToBeClickable(searchAirplanes)).click();
-    }
-
-    public void searchAirplaneBuisness(String from, String to, String firstDate, String secondDate, short adult, float[] kids) {
-        searchFromAirplanesByName(from);
-        searchToAirplanesByName(to);
-        selectDatesAirplain(firstDate, secondDate);
-        selectPassagersForAirplain(adult, kids);
-        selectBuisnessClass();
-
-        wait.until(ExpectedConditions.elementToBeClickable(searchAirplanes)).click();
-    }
-
 
     private By getByWithProperty(String key) {
         return By.xpath(PropertyReader.getProperty(key));
     }
 
-    private class Calendar {
-        private By inputFirstDate;
+    private class CalendarComponent {
+        private final By inputFirstDate =
+            getByWithProperty("xpath.calendarFirstDate");
+        private final By nextButton = getByWithProperty("xpath.calendarNextButton");
+        private final By monthDiv = getByWithProperty("xpath.calendarMonthDiv");
+        private final By selectButton =
+            getByWithProperty("xpath.calendarSelectButton");
+
+        private final String monthAttributeName = "data-month-date";
+        private final DateTimeFormatter attributeFormatter =
+            DateTimeFormatter.ofPattern("MM.yyyy");
+
+        private void selectDate(String dateStr) {
+            wait.until(ExpectedConditions.elementToBeClickable(inputFirstDate))
+                .click();
+
+            pickDate(LocalDate.parse(dateStr, formatter));
+
+            wait.until(ExpectedConditions.elementToBeClickable(selectButton)).click();
+        }
+
+        private void selectDates(String startDateStr, String endDateStr) {
+            LocalDate startDate = LocalDate.parse(startDateStr, formatter);
+            LocalDate endDate = LocalDate.parse(endDateStr, formatter);
+
+            wait.until(ExpectedConditions.elementToBeClickable(inputFirstDate))
+                .click();
+
+            pickDate(startDate);
+
+            pickDate(endDate);
+
+            wait.until(ExpectedConditions.elementToBeClickable(selectButton)).click();
+        }
+
+        private void pickDate(LocalDate targetDate) {
+            String targetMonthValue = targetDate.format(attributeFormatter);
+            int targetDay = targetDate.getDayOfMonth();
+
+            WebElement currentMonth =
+                wait.until(ExpectedConditions.presenceOfElementLocated(monthDiv));
+            String currentMonthVal = currentMonth.getAttribute(monthAttributeName);
+
+            while (!currentMonthVal.equals(targetMonthValue)) {
+            wait.until(ExpectedConditions.elementToBeClickable(nextButton)).click();
+
+            currentMonth =
+                wait.until(ExpectedConditions.presenceOfElementLocated(monthDiv));
+            currentMonthVal = currentMonth.getAttribute(monthAttributeName);
+            }
+
+            String dayXpath =
+                "//div[@data-month-date='%s']//span[@data-ti='calendar-day-cell-info-container']//span[text()='%d']"
+                    .formatted(targetMonthValue, targetDay);
+
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(dayXpath)))
+                .click();
+        }
+    }
+
+    private class LocationComponent {
+        private final By fromInput = getByWithProperty("xpath.locationFrom");
+        private final By toInput = getByWithProperty("xpath.locationTo");
+
+        private final String listCellXPath = "//div[@data-ti=\"dropdown-item\"]//div[@data-ti=\"cell\"]//span[text()='%s']";
+
+        private void inputFirstDuration(String duration) {
+            fillDuration(toInput, duration);
+        }
+
+        private void inputSecondDuration(String duration) {
+            fillDuration(fromInput, duration);
+        }
+
+        private void fillDuration(By locator, String duration) {
+            WebElement input = wait.until(ExpectedConditions.elementToBeClickable(locator));
+            
+            input.click();
+            input.clear();
+            input.sendKeys(duration);
+
+            By xPath = By.xpath(listCellXPath.formatted(duration));
+            wait.until(ExpectedConditions.elementToBeClickable(xPath)).click();
+
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@data-ti='dropdown-item']")));
+        }
+    }
+    private class PassengerComponent {
+        private final By menuTrigger = getByWithProperty("xpath.passengerMenu");
+        private final By adultPlus = getByWithProperty("xpath.passengerAdultPlus");
+        private final By adultMinus = getByWithProperty("xpath.passengerAdultMinus");
+        private final By adultCounterValue = getByWithProperty("xpath.passengerAdultCounterValue");
+        private final By addChildButton = getByWithProperty("xpath.passengerAddChildButton");
+
+        private void setAdults(int targetCount) {
+            ensureMenuOpened();
+            
+            WebElement counter = wait.until(ExpectedConditions.visibilityOfElementLocated(adultCounterValue));
+            int current = Integer.parseInt(counter.getText());
+
+            while (current < targetCount) {
+                driver.findElement(adultPlus).click();
+                current++;
+            }
+
+            while (current > targetCount && current > 1) {
+                driver.findElement(adultMinus).click();
+                current--;
+            }
+        }
+
+        private void addChildren(String... ages) {
+            ensureMenuOpened();
+
+            for (String age : ages) {
+                wait.until(ExpectedConditions.elementToBeClickable(addChildButton)).click();
+
+                String xpath = "//div[@data-ti='suggest-container']//span[" +       //space issue
+                            "normalize-space(translate(., '\u00a0', ' ')) = '%s'" +
+                            "]";
+                
+                By childAgeLocator = By.xpath(xpath.formatted(age));
+
+                wait.until(ExpectedConditions.elementToBeClickable(childAgeLocator)).click();
+            }
+        }
+
+        private void setTravelClass(String travelClass) {
+            ensureMenuOpened();
+            By classLocator = By.xpath("//button[@data-ti='segment_control_button' and text()='%s']".formatted(travelClass));
+            wait.until(ExpectedConditions.elementToBeClickable(classLocator)).click();
+        }
+
+        private void ensureMenuOpened() {
+            if (driver.findElements(adultPlus).isEmpty()) {
+                wait.until(ExpectedConditions.elementToBeClickable(menuTrigger)).click();
+            }
+        }
+    }
+
+    private class NightsComponent {
+        private final By nightsTrigger = By.xpath("//div[@data-ti='nights_input-root']");
+        private final By fromSlider = By.xpath("//input[@data-ti='fromInput']");
+        private final By toSlider = By.xpath("//input[@data-ti='toInput']");
+
+        public void setNightsRange(int from, int to) {
+            wait.until(ExpectedConditions.elementToBeClickable(nightsTrigger)).click();
+
+            WebElement fromInput = wait.until(ExpectedConditions.presenceOfElementLocated(fromSlider));
+            WebElement toInput = wait.until(ExpectedConditions.presenceOfElementLocated(toSlider));
+
+            setSliderValueJS(fromInput, from);
+            setSliderValueJS(toInput, to);
+        }
+
+        private void setSliderValueJS(WebElement slider, int value) {
+            String script = 
+                "var input = arguments[0];" +
+                "var value = arguments[1];" +
+                "var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;" +
+                "setter.call(input, value);" +
+                "input.dispatchEvent(new Event('input', { bubbles: true }));" +
+                "input.dispatchEvent(new Event('change', { bubbles: true }));";
+            
+            ((JavascriptExecutor) driver).executeScript(script, slider, value);
+        }
     }
 }
