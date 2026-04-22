@@ -1,20 +1,15 @@
 package org.example.pages;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import org.example.PropertyReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 
-public class MainPage {
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class MainPage extends Page {
     private final DateTimeFormatter formatter =
     DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -26,8 +21,7 @@ public class MainPage {
     private final By searchButton = getByWithProperty("xpath.searchButton");
 
     public MainPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        super(driver); 
     }
 
     public void selectDate(String date) {
@@ -65,10 +59,6 @@ public class MainPage {
 
     public void search() {
         wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
-    }
-
-    private By getByWithProperty(String key) {
-        return By.xpath(PropertyReader.getProperty(key));
     }
 
     private class CalendarComponent {
