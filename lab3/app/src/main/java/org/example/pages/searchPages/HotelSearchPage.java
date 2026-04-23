@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import org.example.pages.searchPages.records.AccommodationType;
 import org.example.pages.searchPages.records.HotelResult;
-import org.example.specificPage.HotelPage;
+import org.example.pages.specificPage.HotelPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;

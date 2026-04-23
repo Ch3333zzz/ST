@@ -2,16 +2,20 @@ package org.example.pages;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+import org.example.pages.searchPages.AviaSearchPage;
+import org.example.pages.searchPages.BusSearchPage;
+import org.example.pages.searchPages.HotelSearchPage;
+import org.example.pages.searchPages.RailwaySearchPage;
+import org.example.pages.searchPages.TourSearchPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-
 public class MainPage extends Page {
-    private final DateTimeFormatter formatter =
-    DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private final CalendarComponent calendar = new CalendarComponent();
     private final LocationComponent lComponent = new LocationComponent();
@@ -21,7 +25,116 @@ public class MainPage extends Page {
     private final By searchButton = getByWithProperty("xpath.searchButton");
 
     public MainPage(WebDriver driver) {
-        super(driver); 
+        super(driver);
+    }
+
+    public HotelSearchPage searchHotel(String destination, String checkIn,
+            String checkOut, int adults, String... kidAges) {
+
+        selectHotel();
+
+        inputSecondDuration(destination);
+        selectDates(checkIn, checkOut);
+        setAdults(adults);
+
+        if (kidAges.length > 0) {
+            addChildren(kidAges);
+        }
+
+        search();
+
+        return new HotelSearchPage(driver);
+    }
+
+    public AviaSearchPage searchAvia(String destination, String returnDestination, String firstDate,
+            String secondDate, int adults, String travelClass, String... kidAges) {
+        selectAvia();
+
+        inputFirstDuration(destination);
+        inputSecondDuration(returnDestination);
+
+        if (secondDate != null)
+            selectDates(firstDate, secondDate);
+        else
+            selectDate(firstDate);
+
+        setAdults(adults);
+
+        if (kidAges.length > 0) {
+            addChildren(kidAges);
+        }
+
+        setTravelClass(travelClass);
+
+        search();
+
+        return new AviaSearchPage(driver);
+    }
+
+    public RailwaySearchPage searchTrain(String from, String to, String date, int adults, String... kidAges) {
+        selectTrain();
+
+        inputSecondDuration(from);
+        inputFirstDuration(to);
+        selectDate(date);
+        setAdults(adults);
+
+        if (kidAges.length > 0) {
+            addChildren(kidAges);
+        }
+
+        search();
+        return new RailwaySearchPage(driver);
+    }
+
+    public void selectTrain() {
+        By trainButton = getByWithProperty("xpath.railwayButton");
+        wait.until(ExpectedConditions.elementToBeClickable(trainButton)).click();
+    }
+
+    public BusSearchPage searchBus(String from, String to, String date, int adults, String... kidAges) {
+        selectBus();
+
+        inputSecondDuration(from);
+        inputFirstDuration(to);
+        selectDate(date);
+        setAdults(adults);
+
+        if (kidAges.length > 0) {
+            addChildren(kidAges);
+        }
+
+        search();
+        return new BusSearchPage(driver);
+    }
+
+    public void selectBus() {
+        By busButton = getByWithProperty("xpath.busButton");
+        wait.until(ExpectedConditions.elementToBeClickable(busButton)).click();
+    }
+
+    public TourSearchPage searchTour(String from, String to, String date, int nightsFrom, int nightsTo, int adults,
+            String... kidAges) {
+        selectTour();
+
+        inputSecondDuration(from);
+        inputFirstDuration(to);
+        selectDate(date);
+
+        setNightsRange(nightsFrom, nightsTo);
+
+        setAdults(adults);
+        if (kidAges.length > 0) {
+            addChildren(kidAges);
+        }
+
+        search();
+        return new TourSearchPage(driver);
+    }
+
+    public void selectTour() {
+        By tourButton = getByWithProperty("xpath.tourButton");
+        wait.until(ExpectedConditions.elementToBeClickable(tourButton)).click();
     }
 
     public void selectDate(String date) {
@@ -56,26 +169,36 @@ public class MainPage extends Page {
         nComponent.setNightsRange(from, to);
     }
 
+    public void selectHotel() {
+        By hotelElement = getByWithProperty("xpath.hotelButton");
+
+        wait.until(ExpectedConditions.elementToBeClickable(hotelElement))
+                .click();
+    }
+
+    public void selectAvia() {
+        By hotelElement = getByWithProperty("xpath.aviaButton");
+
+        wait.until(ExpectedConditions.elementToBeClickable(hotelElement))
+                .click();
+    }
 
     public void search() {
         wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
     }
 
     private class CalendarComponent {
-        private final By inputFirstDate =
-            getByWithProperty("xpath.calendarFirstDate");
+        private final By inputFirstDate = getByWithProperty("xpath.calendarFirstDate");
         private final By nextButton = getByWithProperty("xpath.calendarNextButton");
         private final By monthDiv = getByWithProperty("xpath.calendarMonthDiv");
-        private final By selectButton =
-            getByWithProperty("xpath.calendarSelectButton");
+        private final By selectButton = getByWithProperty("xpath.calendarSelectButton");
 
         private final String monthAttributeName = "data-month-date";
-        private final DateTimeFormatter attributeFormatter =
-            DateTimeFormatter.ofPattern("MM.yyyy");
+        private final DateTimeFormatter attributeFormatter = DateTimeFormatter.ofPattern("MM.yyyy");
 
         private void selectDate(String dateStr) {
             wait.until(ExpectedConditions.elementToBeClickable(inputFirstDate))
-                .click();
+                    .click();
 
             pickDate(LocalDate.parse(dateStr, formatter));
 
@@ -87,7 +210,7 @@ public class MainPage extends Page {
             LocalDate endDate = LocalDate.parse(endDateStr, formatter);
 
             wait.until(ExpectedConditions.elementToBeClickable(inputFirstDate))
-                .click();
+                    .click();
 
             pickDate(startDate);
 
@@ -100,24 +223,21 @@ public class MainPage extends Page {
             String targetMonthValue = targetDate.format(attributeFormatter);
             int targetDay = targetDate.getDayOfMonth();
 
-            WebElement currentMonth =
-                wait.until(ExpectedConditions.presenceOfElementLocated(monthDiv));
+            WebElement currentMonth = wait.until(ExpectedConditions.presenceOfElementLocated(monthDiv));
             String currentMonthVal = currentMonth.getAttribute(monthAttributeName);
 
             while (!currentMonthVal.equals(targetMonthValue)) {
-            wait.until(ExpectedConditions.elementToBeClickable(nextButton)).click();
+                wait.until(ExpectedConditions.elementToBeClickable(nextButton)).click();
 
-            currentMonth =
-                wait.until(ExpectedConditions.presenceOfElementLocated(monthDiv));
-            currentMonthVal = currentMonth.getAttribute(monthAttributeName);
+                currentMonth = wait.until(ExpectedConditions.presenceOfElementLocated(monthDiv));
+                currentMonthVal = currentMonth.getAttribute(monthAttributeName);
             }
 
-            String dayXpath =
-                "//div[@data-month-date='%s']//span[@data-ti='calendar-day-cell-info-container']//span[text()='%d']"
+            String dayXpath = "//div[@data-month-date='%s']//span[@data-ti='calendar-day-cell-info-container']//span[text()='%d']"
                     .formatted(targetMonthValue, targetDay);
 
             wait.until(ExpectedConditions.elementToBeClickable(By.xpath(dayXpath)))
-                .click();
+                    .click();
         }
     }
 
@@ -137,7 +257,7 @@ public class MainPage extends Page {
 
         private void fillDuration(By locator, String duration) {
             WebElement input = wait.until(ExpectedConditions.elementToBeClickable(locator));
-            
+
             input.click();
             input.clear();
             input.sendKeys(duration);
@@ -148,6 +268,7 @@ public class MainPage extends Page {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@data-ti='dropdown-item']")));
         }
     }
+
     private class PassengerComponent {
         private final By menuTrigger = getByWithProperty("xpath.passengerMenu");
         private final By adultPlus = getByWithProperty("xpath.passengerAdultPlus");
@@ -157,7 +278,7 @@ public class MainPage extends Page {
 
         private void setAdults(int targetCount) {
             ensureMenuOpened();
-            
+
             WebElement counter = wait.until(ExpectedConditions.visibilityOfElementLocated(adultCounterValue));
             int current = Integer.parseInt(counter.getText());
 
@@ -178,10 +299,10 @@ public class MainPage extends Page {
             for (String age : ages) {
                 wait.until(ExpectedConditions.elementToBeClickable(addChildButton)).click();
 
-                String xpath = "//div[@data-ti='suggest-container']//span[" +       //space issue
-                            "normalize-space(translate(., '\u00a0', ' ')) = '%s'" +
-                            "]";
-                
+                String xpath = "//div[@data-ti='suggest-container']//span[" + // space issue
+                        "normalize-space(translate(., '\u00a0', ' ')) = '%s'" +
+                        "]";
+
                 By childAgeLocator = By.xpath(xpath.formatted(age));
 
                 wait.until(ExpectedConditions.elementToBeClickable(childAgeLocator)).click();
@@ -190,7 +311,8 @@ public class MainPage extends Page {
 
         private void setTravelClass(String travelClass) {
             ensureMenuOpened();
-            By classLocator = By.xpath("//button[@data-ti='segment_control_button' and text()='%s']".formatted(travelClass));
+            By classLocator = By
+                    .xpath("//button[@data-ti='segment_control_button' and text()='%s']".formatted(travelClass));
             wait.until(ExpectedConditions.elementToBeClickable(classLocator)).click();
         }
 
@@ -217,14 +339,13 @@ public class MainPage extends Page {
         }
 
         private void setSliderValueJS(WebElement slider, int value) {
-            String script = 
-                "var input = arguments[0];" +
-                "var value = arguments[1];" +
-                "var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;" +
-                "setter.call(input, value);" +
-                "input.dispatchEvent(new Event('input', { bubbles: true }));" +
-                "input.dispatchEvent(new Event('change', { bubbles: true }));";
-            
+            String script = "var input = arguments[0];" +
+                    "var value = arguments[1];" +
+                    "var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;" +
+                    "setter.call(input, value);" +
+                    "input.dispatchEvent(new Event('input', { bubbles: true }));" +
+                    "input.dispatchEvent(new Event('change', { bubbles: true }));";
+
             ((JavascriptExecutor) driver).executeScript(script, slider, value);
         }
     }
