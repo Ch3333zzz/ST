@@ -2,7 +2,7 @@ package org.example;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.example.pages.MainPage;
@@ -16,13 +16,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class AviaSearchPageTest {
 
-    private WebDriver driver;
-    private AviaSearchPage searchPage;
-    private WebDriverWait wait;
+    private List<WebDriver> driverList;
 
     private final String from = "Москва";
     private final String to = "Сочи";
@@ -30,75 +29,103 @@ public class AviaSearchPageTest {
 
     @BeforeEach
     public void setUp() {
+        driverList = new ArrayList<>();
 
-        ChromeOptions options = new ChromeOptions();
+        driverList.add(new ChromeDriver());
 
-        // options.addArguments("--headless=new");
+        FirefoxOptions options = new FirefoxOptions();
 
-        driver = new ChromeDriver(options);
+        options.addArguments("--width=1136");
+        options.addArguments("--height=741");
 
-        driver.get(PropertyReader.getProperty("mainpage"));
-        MainPage mainPage = new MainPage(driver);
+        WebDriver driver = new FirefoxDriver(options);
 
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-        searchPage = mainPage.searchAvia(from, to, date, null, 1, "Эконом", new String[] {});
+        driverList.add(driver);
     }
 
     @AfterEach
     public void tearDown() {
-        if (driver != null)
-            driver.quit();
+        if (driverList != null) {
+            driverList.forEach(WebDriver::quit);
+        }
     }
 
     @Test
     public void testAviaFilters() {
-        searchPage.selectFilter("Прямой");
-        searchPage.getAviaResults(5)
-                .forEach(ticket -> assertTrue(ticket.segments().get(0).isDirect()));
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            AviaSearchPage searchPage = mainPage.searchAvia(from, to, date, null, 1, "Эконом", new String[] {});
 
-        searchPage.selectFilter("С багажом");
-        searchPage.getAviaResults(5).forEach(ticket -> assertTrue(ticket.withBaggage(), "Найден билет без багажа!"));
+            searchPage.selectFilter("Прямой");
+            searchPage.getAviaResults(5)
+                    .forEach(ticket -> assertTrue(ticket.segments().get(0).isDirect()));
+
+            searchPage.selectFilter("С багажом");
+            searchPage.getAviaResults(5)
+                    .forEach(ticket -> assertTrue(ticket.withBaggage()));
+        });
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "S7 Airlines", "Аэрофлот" })
     public void testAirlineFilter(String airlineName) {
-        searchPage.selectFilter(airlineName);
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            AviaSearchPage searchPage = mainPage.searchAvia(from, to, date, null, 1, "Эконом", new String[] {});
 
-        searchPage.getAviaResults(3).forEach(ticket -> assertTrue(ticket.airlines().contains(airlineName)));
+            searchPage.selectFilter(airlineName);
+            searchPage.getAviaResults(3).forEach(ticket -> assertTrue(ticket.airlines().contains(airlineName)));
+        });
     }
 
     @Test
     public void firstEarly() {
-        searchPage.sortBy("Сначала ранние");
-        List<AviaResult> earlyResults = searchPage.getAviaResults(5);
-        for (int i = 0; i < earlyResults.size() - 1; i++) {
-            String timeCurrent = earlyResults.get(i).segments().get(0).departureTime();
-            String timeNext = earlyResults.get(i + 1).segments().get(0).departureTime();
-            assertTrue(timeCurrent.compareTo(timeNext) <= 0);
-        }
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            AviaSearchPage searchPage = mainPage.searchAvia(from, to, date, null, 1, "Эконом", new String[] {});
+
+            searchPage.sortBy("Сначала ранние");
+            List<AviaResult> earlyResults = searchPage.getAviaResults(5);
+            for (int i = 0; i < earlyResults.size() - 1; i++) {
+                String timeCurrent = earlyResults.get(i).segments().get(0).departureTime();
+                String timeNext = earlyResults.get(i + 1).segments().get(0).departureTime();
+                assertTrue(timeCurrent.compareTo(timeNext) <= 0);
+            }
+        });
     }
 
     @Test
     public void testLate() {
-        searchPage.sortBy("Сначала поздние");
-        List<AviaResult> lateResults = searchPage.getAviaResults(5);
-        for (int i = 0; i < lateResults.size() - 1; i++) {
-            String timeCurrent = lateResults.get(i).segments().get(0).departureTime();
-            String timeNext = lateResults.get(i + 1).segments().get(0).departureTime();
-            assertTrue(timeCurrent.compareTo(timeNext) >= 0);
-        }
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            AviaSearchPage searchPage = mainPage.searchAvia(from, to, date, null, 1, "Эконом", new String[] {});
+
+            searchPage.sortBy("Сначала поздние");
+            List<AviaResult> lateResults = searchPage.getAviaResults(5);
+            for (int i = 0; i < lateResults.size() - 1; i++) {
+                String timeCurrent = lateResults.get(i).segments().get(0).departureTime();
+                String timeNext = lateResults.get(i + 1).segments().get(0).departureTime();
+                assertTrue(timeCurrent.compareTo(timeNext) >= 0);
+            }
+        });
     }
 
     @Test
     public void testAviaPriceSorting() {
-        searchPage.sortBy("Сначала дешёвые");
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            AviaSearchPage searchPage = mainPage.searchAvia(from, to, date, null, 1, "Эконом", new String[] {});
 
-        List<AviaResult> results = searchPage.getAviaResults(5);
-        for (int i = 0; i < results.size() - 1; i++) {
-            assertTrue(results.get(i).price() <= results.get(i + 1).price());
-        }
+            searchPage.sortBy("Сначала дешёвые");
+            List<AviaResult> results = searchPage.getAviaResults(5);
+            for (int i = 0; i < results.size() - 1; i++) {
+                assertTrue(results.get(i).price() <= results.get(i + 1).price());
+            }
+        });
     }
-
 }

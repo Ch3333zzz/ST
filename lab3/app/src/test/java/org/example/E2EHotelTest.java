@@ -13,16 +13,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class E2EHotelTest {
 
-    private WebDriver driver;
-    private HotelSearchPage searchPage;
+    private List<WebDriver> driverList;
 
     private final String city = "Москва";
     private final String checkInDate = "29.06.2026";
@@ -37,17 +40,18 @@ public class E2EHotelTest {
 
     @BeforeEach
     public void setUp() {
-        ChromeOptions options = new ChromeOptions();
+        driverList = new ArrayList<>();
 
-        // options.addArguments("--headless=new");
+        driverList.add(new ChromeDriver());
 
-        driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        FirefoxOptions options = new FirefoxOptions();
 
-        driver.get(PropertyReader.getProperty("mainpage"));
-        MainPage mainPage = new MainPage(driver);
+        options.addArguments("--width=1136");
+        options.addArguments("--height=741");
 
-        searchPage = mainPage.searchHotel(city, checkInDate, checkOutDate, adultsCount, kidAgesBothTypes);
+        WebDriver driver = new FirefoxDriver(options);
+
+        driverList.add(driver);
     }
 
     @ParameterizedTest
@@ -55,9 +59,16 @@ public class E2EHotelTest {
             "Гостиничный комплекс \"FISHERIX\", ДУПЛЕКС"
     })
     public void testHotelBookingFlow(String targetHotelName, String targetRoomName) {
-        HotelPage hotelPage = searchPage.selectHotel(targetHotelName);
-        HotelPaymentPage paymentPage = hotelPage.book(targetRoomName);
-        verifyBookingDetails(paymentPage, targetHotelName);
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkInDate, checkOutDate, adultsCount,
+                    kidAgesBothTypes);
+
+            HotelPage hotelPage = searchPage.selectHotel(targetHotelName);
+            HotelPaymentPage paymentPage = hotelPage.book(targetRoomName);
+            verifyBookingDetails(paymentPage, targetHotelName);
+        });
     }
 
     @ParameterizedTest
@@ -65,9 +76,16 @@ public class E2EHotelTest {
             "Дизайнерская трёхкомнатная квартира в стиле семейного лофта"
     })
     public void testApartmentBookingFlow(String targetApartmentName) {
-        HotelPage hotelPage = searchPage.selectHotel(targetApartmentName);
-        HotelPaymentPage paymentPage = hotelPage.book();
-        verifyBookingDetails(paymentPage, targetApartmentName);
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkInDate, checkOutDate, adultsCount,
+                    kidAgesBothTypes);
+
+            HotelPage hotelPage = searchPage.selectHotel(targetApartmentName);
+            HotelPaymentPage paymentPage = hotelPage.book();
+            verifyBookingDetails(paymentPage, targetApartmentName);
+        });
     }
 
     private void verifyBookingDetails(HotelPaymentPage paymentPage, String expectedName) {
@@ -76,24 +94,18 @@ public class E2EHotelTest {
 
         assertAll(
                 () -> assertTrue(details.hotelName().contains(expectedName)),
-
                 () -> assertTrue(details.city().contains(city)),
-
                 () -> assertTrue(details.checkInDate().contains(expectedCheckIn)),
-
                 () -> assertTrue(details.checkOutDate().contains(expectedCheckOut)),
-
                 () -> assertTrue(info.contains(String.valueOf(adultsCount) + " взросл")),
-
                 () -> assertTrue(info.contains(String.valueOf(kidAgesBothTypes.length) + " дет")),
-
                 () -> assertTrue(info.contains(String.valueOf(nightsCount + " ноч"))));
     }
 
     @AfterEach
     public void tearDown() {
-        if (driver != null) {
-            driver.quit();
+        if (driverList != null) {
+            driverList.forEach(WebDriver::quit);
         }
     }
 }

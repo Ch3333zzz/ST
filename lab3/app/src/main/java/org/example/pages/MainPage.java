@@ -10,6 +10,7 @@ import org.example.pages.searchPages.RailwaySearchPage;
 import org.example.pages.searchPages.TourSearchPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -258,9 +259,18 @@ public class MainPage extends Page {
         private void fillDuration(By locator, String duration) {
             WebElement input = wait.until(ExpectedConditions.elementToBeClickable(locator));
 
-            input.click();
+            input.sendKeys(Keys.CONTROL + "a");
+            input.sendKeys(Keys.BACK_SPACE);
+
             input.clear();
-            input.sendKeys(duration);
+
+            for (char c : duration.toCharArray()) {
+                input.sendKeys(String.valueOf(c));
+                try {
+                    Thread.sleep(200);
+                } catch (Exception ignored) {
+                }
+            }
 
             By xPath = By.xpath(listCellXPath.formatted(duration));
             wait.until(ExpectedConditions.elementToBeClickable(xPath)).click();

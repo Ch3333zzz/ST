@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.example.pages.MainPage;
@@ -15,13 +16,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class HotelSearchPageTest {
 
-    private WebDriver driver;
-    private HotelSearchPage searchPage;
-    private MainPage mainPage;
+    public List<WebDriver> driverList;
 
     private final String city = "Москва";
     private final String checkIn = "29.06.2026";
@@ -30,74 +30,94 @@ public class HotelSearchPageTest {
 
     @BeforeEach
     public void setUp() {
+        driverList = new ArrayList<>();
 
-        ChromeOptions options = new ChromeOptions();
+        driverList.add(new ChromeDriver());
 
-        // options.addArguments("--headless=new");
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("--width=1136");
+        options.addArguments("--height=741");
 
-        driver = new ChromeDriver(options);
-
-        driver.get(PropertyReader.getProperty("mainpage"));
-        mainPage = new MainPage(driver);
-
-        searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults);
-
+        driverList.add(new FirefoxDriver(options));
     }
 
     @AfterEach
     public void tearDown() {
-        if (driver != null) {
-            driver.quit();
+        if (driverList != null) {
+            driverList.forEach(WebDriver::quit);
         }
     }
 
     @Test
     public void testFilterByHotelType() {
-        searchPage.selectFilter("Отели");
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults);
 
-        List<HotelResult> results = searchPage.getResults(3);
-        assertFalse(results.isEmpty());
-        results.forEach(h -> assertEquals(AccommodationType.HOTEL, h.type()));
+            searchPage.selectFilter("Отели");
+
+            List<HotelResult> results = searchPage.getResults(3);
+            assertFalse(results.isEmpty());
+            results.forEach(h -> assertEquals(AccommodationType.HOTEL, h.type()));
+        });
     }
 
     @Test
     public void testSortingByPriceAsc() {
-        searchPage.sortBy("Сначала дешёвые");
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults);
 
-        List<HotelResult> results = searchPage.getResults(5);
-        for (int i = 0; i < results.size() - 1; i++) {
-            assertTrue(results.get(i).price() <= results.get(i + 1).price());
-        }
+            searchPage.sortBy("Сначала дешёвые");
+
+            List<HotelResult> results = searchPage.getResults(5);
+            for (int i = 0; i < results.size() - 1; i++) {
+                assertTrue(results.get(i).price() <= results.get(i + 1).price());
+            }
+        });
     }
 
     @Test
     public void testSortingByPriceDesc() {
-        searchPage.sortBy("Сначала дорогие");
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults);
 
-        List<HotelResult> results = searchPage.getResults(5);
-        assertFalse(results.isEmpty());
+            searchPage.sortBy("Сначала дорогие");
 
-        for (int i = 0; i < results.size() - 1; i++) {
-            int currentPrice = results.get(i).price();
-            int nextPrice = results.get(i + 1).price();
-            assertTrue(currentPrice >= nextPrice);
-        }
+            List<HotelResult> results = searchPage.getResults(5);
+            assertFalse(results.isEmpty());
+
+            for (int i = 0; i < results.size() - 1; i++) {
+                int currentPrice = results.get(i).price();
+                int nextPrice = results.get(i + 1).price();
+                assertTrue(currentPrice >= nextPrice);
+            }
+        });
     }
 
     @Test
     public void testPriceRangeFilter() {
-        int minPrice = 5000;
-        int maxPrice = 15000;
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults);
 
-        searchPage.selectPriceRange(minPrice, maxPrice);
+            int minPrice = 5000;
+            int maxPrice = 15000;
 
-        List<HotelResult> results = searchPage.getResults(5);
-        assertFalse(results.isEmpty());
+            searchPage.selectPriceRange(minPrice, maxPrice);
 
-        for (HotelResult hotel : results) {
-            int pricePerNight = hotel.price() / hotel.nights();
+            List<HotelResult> results = searchPage.getResults(5);
+            assertFalse(results.isEmpty());
 
-            assertTrue(pricePerNight >= minPrice && pricePerNight <= maxPrice);
-        }
+            for (HotelResult hotel : results) {
+                int pricePerNight = hotel.price() / hotel.nights();
+                assertTrue(pricePerNight >= minPrice && pricePerNight <= maxPrice);
+            }
+        });
     }
 }

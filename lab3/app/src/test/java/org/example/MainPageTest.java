@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -25,11 +26,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class MainPageTest {
-    public WebDriver driver;
-    private MainPage mainPage;
+    public List<WebDriver> driverList;
 
     private final static String startDate = "29.06.2026";
     private final static String endDate = "12.07.2026";
@@ -51,49 +52,47 @@ public class MainPageTest {
 
     @BeforeEach
     public void setUp() {
-        ChromeOptions options = new ChromeOptions();
+        driverList = new ArrayList<>();
 
-        // options.addArguments("--headless=new");
+        driverList.add(new ChromeDriver());
 
-        driver = new ChromeDriver(options);
+        // FirefoxOptions options = new FirefoxOptions();
+        // options.addArguments("--width=1136");
+        // options.addArguments("--height=741");
 
-        String url = PropertyReader.getProperty("mainpage");
-        driver.get(url);
-
-        mainPage = new MainPage(driver);
+        // driverList.add(new FirefoxDriver(options));
     }
 
     @ParameterizedTest(name = "{index} => {0}")
     @MethodSource("hotelSearchDataProvider")
     public void searchHotelTest(String testName, String city, String checkIn, String checkOut, int adults,
             String[] kids) {
-        HotelSearchPage searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults, kids);
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            HotelSearchPage searchPage = mainPage.searchHotel(city, checkIn, checkOut, adults, kids);
 
-        int cardsToCheck = 1;
+            int cardsToCheck = 1;
+            List<HotelResult> results = searchPage.getResults(cardsToCheck);
+            int expectedTotalGuests = adults + (kids != null ? kids.length : 0);
 
-        List<HotelResult> results = searchPage.getResults(cardsToCheck);
-
-        int expectedTotalGuests = adults + (kids != null ? kids.length : 0);
-        assertAll("Checking results of search hotels",
-                () -> assertFalse(results.isEmpty()),
-                () -> {
-                    for (int i = 0; i < results.size(); i++) {
-                        HotelResult hotel = results.get(i);
-                        int index = i + 1;
-
-                        assertAll("Params " + index,
-                                () -> assertTrue(hotel.location().contains(city)),
-
-                                () -> assertEquals(expectedTotalGuests, hotel.guests()),
-
-                                () -> assertEquals(expectedNights, hotel.nights()));
-                    }
-                });
+            assertAll("Checking results of search hotels",
+                    () -> assertFalse(results.isEmpty()),
+                    () -> {
+                        for (int i = 0; i < results.size(); i++) {
+                            HotelResult hotel = results.get(i);
+                            int index = i + 1;
+                            assertAll("Params " + index,
+                                    () -> assertTrue(hotel.location().contains(city)),
+                                    () -> assertEquals(expectedTotalGuests, hotel.guests()),
+                                    () -> assertEquals(expectedNights, hotel.nights()));
+                        }
+                    });
+        });
     }
 
     private static Stream<Arguments> hotelSearchDataProvider() {
         return Stream.of(
-                // test-info, city, in, out, adults, kidsAges
                 Arguments.of("ID-1: without kids", city1, startDate, endDate, 3,
                         emptyKidAges),
                 Arguments.of("ID-2: with kids", city1, startDate, endDate, 3, kidAgesBothTypes));
@@ -103,135 +102,123 @@ public class MainPageTest {
     @MethodSource("aviaSearchDataProvider")
     public void aviaSearchTest(String testName, String to, String from, String depDate,
             String retDate, int adults, String travelClass, String[] kids) {
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            AviaSearchPage resultsPage = mainPage.searchAvia(to, from, depDate, retDate, adults, travelClass, kids);
 
-        AviaSearchPage resultsPage = mainPage.searchAvia(to, from, depDate, retDate, adults, travelClass, kids);
+            List<AviaResult> results = resultsPage.getAviaResults(5);
+            int expectedTotalPassengers = adults + kids.length;
 
-        List<AviaResult> results = resultsPage.getAviaResults(5);
-
-        int expectedTotalPassengers = adults + kids.length;
-
-        assertAll("Checking results of search avia",
-                () -> assertFalse(results.isEmpty()),
-                () -> {
-                    for (int i = 0; i < results.size(); i++) {
-                        AviaResult ticket = results.get(i);
-                        int index = i + 1;
-
-                        assertAll(
-                                () -> {
-                                    FlightSegment outward = ticket.segments().get(0);
-                                    assertAll(
-                                            () -> assertTrue(outward.departure().city().contains(from)),
-                                            () -> assertTrue(outward.arrival().city().contains(to)));
-                                },
-                                () -> {
-                                    if (retDate != null && ticket.segments().size() > 1) {
-                                        FlightSegment returnTrip = ticket.segments().get(1);
+            assertAll("Checking results of search avia",
+                    () -> assertFalse(results.isEmpty()),
+                    () -> {
+                        for (int i = 0; i < results.size(); i++) {
+                            AviaResult ticket = results.get(i);
+                            assertAll(
+                                    () -> {
+                                        FlightSegment outward = ticket.segments().get(0);
                                         assertAll(
-                                                () -> assertTrue(returnTrip.departure().city().contains(to)),
-                                                () -> assertTrue(returnTrip.arrival().city().contains(from)));
-                                    }
-                                },
-                                () -> assertEquals(expectedTotalPassengers, ticket.passengers()));
-                    }
-                });
+                                                () -> assertTrue(outward.departure().city().contains(from)),
+                                                () -> assertTrue(outward.arrival().city().contains(to)));
+                                    },
+                                    () -> {
+                                        if (retDate != null && ticket.segments().size() > 1) {
+                                            FlightSegment returnTrip = ticket.segments().get(1);
+                                            assertAll(
+                                                    () -> assertTrue(returnTrip.departure().city().contains(to)),
+                                                    () -> assertTrue(returnTrip.arrival().city().contains(from)));
+                                        }
+                                    },
+                                    () -> assertEquals(expectedTotalPassengers, ticket.passengers()));
+                        }
+                    });
+        });
     }
 
     static Stream<Arguments> aviaSearchDataProvider() {
         return Stream.of(
-                Arguments.of("ID-3: Simple Search", city1, city2, startDate, null,
-                        adultCount, economClass,
+                Arguments.of("ID-3: Simple Search", city1, city2, startDate, null, adultCount, economClass,
                         emptyKidAges),
-
-                Arguments.of("ID-4: Business Class", city1, city2, startDate, null,
-                        adultCount, buisnessClass,
+                Arguments.of("ID-4: Business Class", city1, city2, startDate, null, adultCount, buisnessClass,
                         emptyKidAges),
-
-                Arguments.of("ID-5: Round Trip", city1, city2, startDate, endDate,
-                        adultCount, economClass,
+                Arguments.of("ID-5: Round Trip", city1, city2, startDate, endDate, adultCount, economClass,
                         emptyKidAges),
-
-                Arguments.of("ID-6: Infant (no place)", city1, city2, startDate, null,
-                        adultCount, economClass,
+                Arguments.of("ID-6: Infant (no place)", city1, city2, startDate, null, adultCount, economClass,
                         toddlerKidAges),
-
-                Arguments.of("ID-7: Child (with place)", city1, city2, startDate, null,
-                        adultCount, economClass,
+                Arguments.of("ID-7: Child (with place)", city1, city2, startDate, null, adultCount, economClass,
                         elderKidAges),
-
                 Arguments.of("ID-8: both child types", city2, city1, startDate, null, adultCount, economClass,
-                        kidAgesBothTypes)
-
-        );
+                        kidAgesBothTypes));
     }
 
     @ParameterizedTest(name = "{index} => {0}")
     @MethodSource("railwaySearchDataProvider")
     public void railwaySearchTest(String testName, String from, String to, String date, int adults, String[] kids) {
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            RailwaySearchPage resultsPage = mainPage.searchTrain(from, to, date, adults, kids);
 
-        RailwaySearchPage resultsPage = mainPage.searchTrain(from, to, date, adults, kids);
+            List<RailwayResult> results = resultsPage.getRailwayResults(3);
+            int expectedTotalPassengers = adults + kids.length;
 
-        List<RailwayResult> results = resultsPage.getRailwayResults(3);
-        int expectedTotalPassengers = adults + kids.length;
-
-        assertAll("Checking results of search railway",
-                () -> assertFalse(results.isEmpty()),
-                () -> {
-                    for (int i = 0; i < results.size(); i++) {
-                        RailwayResult train = results.get(i);
-
-                        assertAll(
-                                () -> assertTrue(train.departure().city().contains(from)),
-                                () -> assertTrue(train.arrival().city().contains(to)),
-                                () -> assertEquals(expectedTotalPassengers, train.passengers()),
-                                () -> assertFalse(train.wagonTypes().isEmpty()));
-                    }
-                });
+            assertAll("Checking results of search railway",
+                    () -> assertFalse(results.isEmpty()),
+                    () -> {
+                        for (int i = 0; i < results.size(); i++) {
+                            RailwayResult train = results.get(i);
+                            assertAll(
+                                    () -> assertTrue(train.departure().city().contains(from)),
+                                    () -> assertTrue(train.arrival().city().contains(to)),
+                                    () -> assertEquals(expectedTotalPassengers, train.passengers()),
+                                    () -> assertFalse(train.wagonTypes().isEmpty()));
+                        }
+                    });
+        });
     }
 
     static Stream<Arguments> railwaySearchDataProvider() {
         return Stream.of(
                 Arguments.of("ID-9: Simple Train Search", city1, city2, startDate, adultCount, emptyKidAges),
-
                 Arguments.of("ID-10: Train Search with Kids", city1, city2, startDate, adultCount, kidAgesBothTypes));
     }
 
     @ParameterizedTest(name = "{index} => {0}")
     @MethodSource("busSearchDataProvider")
     public void busSearchTest(String testName, String from, String to, String date, int adults, String[] kids) {
+        driverList.forEach(driver -> {
+            driver.get(PropertyReader.getProperty("mainpage"));
+            MainPage mainPage = new MainPage(driver);
+            BusSearchPage resultsPage = mainPage.searchBus(from, to, date, adults, kids);
 
-        BusSearchPage resultsPage = mainPage.searchBus(from, to, date, adults, kids);
+            List<BusResult> results = resultsPage.getBusResults(3);
+            int expectedTotalPassengers = adults + kids.length;
 
-        List<BusResult> results = resultsPage.getBusResults(3);
-        int expectedTotalPassengers = adults + kids.length;
-
-        assertAll("Checking results of search bus",
-                () -> assertFalse(results.isEmpty()),
-                () -> {
-                    for (int i = 0; i < results.size(); i++) {
-                        BusResult bus = results.get(i);
-
-                        assertAll(
-                                () -> assertTrue(bus.departure().city().contains(from)),
-                                () -> assertTrue(bus.arrival().city().contains(to)),
-                                () -> assertEquals(expectedTotalPassengers, bus.passengers()));
-                    }
-                });
+            assertAll("Checking results of search bus",
+                    () -> assertFalse(results.isEmpty()),
+                    () -> {
+                        for (int i = 0; i < results.size(); i++) {
+                            BusResult bus = results.get(i);
+                            assertAll(
+                                    () -> assertTrue(bus.departure().city().contains(from)),
+                                    () -> assertTrue(bus.arrival().city().contains(to)),
+                                    () -> assertEquals(expectedTotalPassengers, bus.passengers()));
+                        }
+                    });
+        });
     }
 
     private static Stream<Arguments> busSearchDataProvider() {
         return Stream.of(
                 Arguments.of("ID-11: Simple Bus Search", city1, city2, startDate, adultCount, emptyKidAges),
-
-                Arguments.of("ID-12: Bus Search with Kids", city1, city2, startDate, adultCount, kidAgesBothTypes)
-
-        );
+                Arguments.of("ID-12: Bus Search with Kids", city1, city2, startDate, adultCount, kidAgesBothTypes));
     }
 
     @AfterEach
     public void tearDown() {
-        if (driver != null) {
-            driver.quit();
+        if (driverList != null) {
+            driverList.forEach(WebDriver::quit);
         }
     }
 }
