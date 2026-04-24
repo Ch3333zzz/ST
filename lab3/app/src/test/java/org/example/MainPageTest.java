@@ -56,11 +56,11 @@ public class MainPageTest {
 
         driverList.add(new ChromeDriver());
 
-        // FirefoxOptions options = new FirefoxOptions();
-        // options.addArguments("--width=1136");
-        // options.addArguments("--height=741");
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("--width=1136");
+        options.addArguments("--height=741");
 
-        // driverList.add(new FirefoxDriver(options));
+        driverList.add(new FirefoxDriver(options));
     }
 
     @ParameterizedTest(name = "{index} => {0}")
