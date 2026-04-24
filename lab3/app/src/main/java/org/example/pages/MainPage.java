@@ -1,5 +1,6 @@
 package org.example.pages;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -13,6 +14,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class MainPage extends Page {
@@ -264,13 +267,18 @@ public class MainPage extends Page {
 
             input.clear();
 
-            for (char c : duration.toCharArray()) {
-                input.sendKeys(String.valueOf(c));
-                try {
-                    Thread.sleep(200);
-                } catch (Exception ignored) {
-                }
-            }
+            Actions actions = new Actions(driver, Duration.ofSeconds(1));
+
+            actions.moveToElement(input).click().sendKeys(duration).pause(Duration.ofSeconds(3)).perform();
+
+            // for (char c : duration.toCharArray()) {
+            // input.sendKeys(String.valueOf(c));
+            // try {
+            // Thread.sleep(200);
+            // } catch (Exception ignored) {
+            // }
+            // }
+            // actions api
 
             By xPath = By.xpath(listCellXPath.formatted(duration));
             wait.until(ExpectedConditions.elementToBeClickable(xPath)).click();

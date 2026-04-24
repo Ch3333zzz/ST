@@ -71,6 +71,7 @@ rectangle "Tutu.ru" {
   
   rent_auto ..> pay : <<include>>
   rent_auto ..> select_car : <<include>>
+  rent_auto ..> p_info : <<include>>
 
   buy_tour ..> select_hotel : <<include>>
   buy_tour ..> select_ticket : <<include>>
