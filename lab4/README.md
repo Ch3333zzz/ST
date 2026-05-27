@@ -7,6 +7,8 @@
 
 ## Задание
 
+<!-- ![joke](./resources/joke.jpg) -->
+
 С помощью программного пакета [Apache JMeter](http://jmeter.apache.org/) провести нагрузочное и стресс-тестирование веб-приложения в соответствии с вариантом задания.
 
 В ходе нагрузочного тестирования необходимо протестировать 3 конфигурации аппаратного обеспечения и выбрать среди них наиболее дешёвую, удовлетворяющую требованиям по максимальному времени отклика приложения при заданной нагрузке (в соответствии с вариантом).
@@ -98,13 +100,39 @@ jmeter -f -n -t "TesitingTemplate.jmx" -q test.properties -l results.csv -e -o .
 
 #### Стоило ли учитывать разный Ramp up?
 
-Если сравнить результаты первого конфига с маленьким и с нормальным ramp up, то можно заметить, как этот критерий напрямую влияет на результаты тестов: в [первом случае](./loadResults/smallRumpUp/config1.csv) количество ошибок 240, во [втором](./loadResults/normalRumpUp/config1.csv) же 200. Аналогичная ситуация и со вторым конфигом: [было](./loadResults/smallRumpUp/config2.csv) 50, [стало](./loadResults/normalRumpUp/config2.csv) 18. Имеет ли смысл тогда увеличить до большого размера этот параметр? Не совсем, поскольку увеличивая его, мы увеличиваем работу теста и отходим от реальных условий к более простым, и в реальности наше приложение может принести убытки, не смотря на прохождение тестов, делая их по факту бесполезными.
+Если сравнить результаты первого конфига с маленьким и с нормальным ramp up, то можно заметить, как этот критерий напрямую влияет на результаты тестов: в [первом случае](./loadResults/smallRumpUp/config1.csv) количество ошибок 240, во [втором](./loadResults/normalRumpUp/config1.csv) же 200. Аналогичная ситуация и со вторым конфигом: [было](./loadResults/smallRumpUp/config2.csv) 50, [стало](./loadResults/normalRumpUp/config2.csv) 18.
+
+#### Графики
+
+![RespTime](./resources/RespCodesPerSec.png)
+
+![TrPerSec](./resources/TrPerSec.png)
+
+![TotalTrPerSec](./resources/TotalTrPerSec.png)
+
+![RespTime](./resources/ResponseTimePerSecSmth.png)
+
+![Latency](./resources/LatencyReq.png)
+
+##### Графики времени ответа разных конфигов
+
+###### Первый
+
+![Conf1](./resources/graphConf1.png)
+
+###### Второй
+
+![Conf2](./resources/graphConf2.png)
+
+###### Третий
+
+![Conf3](./resources/graphConf3.png)
 
 ### Stress Testing
 
 Изменим следущие [конфигурацию](./stress.properties): добавим большое количество потоков, неограничиваем частоту запросов, а также увеличим длительность теста и ramp up для более наглядного графика.
 
-#### Графики
+#### Графики стресс-тетсирования
 
 ![ThreadGroupVsTime](./resources/ThreadGroupVsTime.png)
 ![ResponseTimeVsTime](./resources/ResponseTimeVsTime.png)
@@ -114,7 +142,17 @@ jmeter -f -n -t "TesitingTemplate.jmx" -q test.properties -l results.csv -e -o .
 
 ![maxThreads](./resources/maxThreads.png)
 
-Следовательно, максимальное количество пользователей - 26.
+Следовательно, максимальное количество пользователей до превышения времени ожидания в 880 мс - 26.
+
+![503](./resources/503PerSecpng.png)
+
+![ActiveThreadsOverTime](./resources/ActiveThreadsOverTime.png)
+
+Следовательно, максимальное количество пользователей до кода 503 равно 282
+
+## Листинг
+
+[Github Repository](https://github.com/Ch3333zzz/ST/tree/master/lab4)
 
 ## Вывод
 
